@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itmuch.mapper.NoteMapper" >
+  <resultMap id="BaseResultMap" type="com.itmuch.model.Note" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="CHAR" />
+    <result column="title
+name" property="title
+name" jdbcType="VARCHAR" />
+    <result column="category_id" property="categoryId" jdbcType="CHAR" />
+    <result column="publish_time" property="publishTime" jdbcType="TIMESTAMP" />
+    <result column="shutdown" property="shutdown" jdbcType="BIT" />
+    <result column="like" property="like" jdbcType="INTEGER" />
+  </resultMap>
+</mapper>
