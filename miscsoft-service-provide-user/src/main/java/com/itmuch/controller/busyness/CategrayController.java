@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -61,10 +63,23 @@ public class CategrayController {
 		return JSONResult.ok();
 	}
 	
-	
-	@RequestMapping("update")
+	/**
+	 * <pre>
+	 *	@RequsetParam == request.getParamater()
+	 *	@RequestBody 是把传过来的json参数转换为实体，依赖
+	 *  dependency
+	 *	groupId com.fasterxml.jackson.core
+	 *	artifactId jackson-databindd
+	 *	dependency
+	 *	同时需要严格控制前端参数为json类型，JSON.stringify(）		
+	 *	最后需要把ajax的类型设置为contentType: "application/json;charset=UTF-8",
+	 *	</pre>
+	 * @param categray
+	 * @return
+	 */
+	@PostMapping(value="update")
 	@ResponseBody
-	public JSONResult update(Categray categray) {
+	public JSONResult update(@RequestBody Categray categray) {
 		
 		categrayMapper.updateByPrimaryKey(categray);
 		return JSONResult.ok();

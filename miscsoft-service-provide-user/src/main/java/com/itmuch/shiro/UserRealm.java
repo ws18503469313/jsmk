@@ -50,6 +50,7 @@ public class UserRealm extends AuthorizingRealm{
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 		info.setRoles(roles);
 		info.setStringPermissions(permission);
+		log.info("授权：AuthorizationInfo--------------------------"+info+"-------------------------");
 		return info;
 	}
 	
@@ -67,7 +68,7 @@ public class UserRealm extends AuthorizingRealm{
 	}
 	
 	private Set<String> getRoleByUsername(String username) {
-		System.out.println("从db获取数据");
+		log.info("------------------------------------从db获取数据-----------------------------------------");
 		Set<String> roles = roleDao.listRoleByUsername(username);
 		log.info(roles.toString());
 		return roles;
@@ -94,11 +95,12 @@ public class UserRealm extends AuthorizingRealm{
 		
 		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, user.getPassword(), "realName");
 		info.setCredentialsSalt(ByteSource.Util.bytes(username));
+		log.info("认证AuthenticationInfo:---------------------"+info+"-------------------------");
 		return info;
 	}
 	
 	public static void main(String[] args) {
-		Md5Hash hash = new Md5Hash("123123","polunzi");
+		Md5Hash hash = new Md5Hash("1","1");
 		System.out.println(hash.toString());
 	}
 }

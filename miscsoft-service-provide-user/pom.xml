@@ -126,21 +126,18 @@
 		<!-- =============================================================================================== -->
 		<!-- 引入 freemarker 模板依赖 -->
 		<dependency>
-		 <groupId>org.springframework.boot</groupId>
-		  <artifactId>spring-boot-starter-freemarker</artifactId> 
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
 		</dependency>
 
 		<!-- 引入 thymeleaf 模板依赖 -->
 		<dependency>
-		 <groupId>org.springframework.boot</groupId>
-		 <artifactId>spring-boot-starter-thymeleaf</artifactId> 
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid</artifactId>
-			<version>1.1.0</version>
-		</dependency>
+		<!-- 使用自带的hika 代替 -->
+		<!-- <dependency> <groupId>com.alibaba</groupId> <artifactId>druid</artifactId> 
+			<version>1.1.0</version> </dependency> -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -184,7 +181,6 @@
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>2.9.0</version>
 		</dependency>
 
 
@@ -211,7 +207,10 @@
 			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
-
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

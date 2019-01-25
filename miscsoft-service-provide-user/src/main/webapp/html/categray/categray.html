@@ -16,14 +16,19 @@
 
 </head>
 <body>
-
+	<div class="layui-btn-group demoBar">
+	  <button class="layui-btn"  onclick="create()">新增</button>
+	  <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
+	  <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
+	  <button class="layui-btn" data-type="isAll">验证是否全选</button>
+	</div>
  	<div class="demoTable">
-    搜索：
-    <div class="layui-inline">
-        <input class="layui-input" name="keyword" id="demoReload" autocomplete="off">
-    </div>
-    <button class="layui-btn" data-type="reload">搜索</button>
-</div>
+	    搜索：
+	    <div class="layui-inline">
+	        <input class="layui-input" name="keyword" id="demoReload" autocomplete="off">
+	    </div>
+	    <button class="layui-btn" data-type="reload">搜索</button>
+	</div>
 	<!-- 表格主体 -->
  	<table class="layui-hide" id="categray" lay-filter="filter"></table>
  	
@@ -41,7 +46,7 @@
 	  
 	  table.render({
 	    elem: '#categray'
-	    ,id:'testReload'
+	    ,id:'idForTable'
 	    ,url:'/categray/list'
 	    ,cols: [[
 	      {type:'checkbox'}
@@ -64,12 +69,26 @@
 			 reload: function(){
 			     var demoReload = $('#demoReload');
 	
-			     table.reload('testReload', {
+			     table.reload('idForTable', {
 			         where: {
 			             name: demoReload.val()
 			         }
-			     });
-			 }
+			     });x
+			 },
+			 getCheckData: function(){ //获取选中数据
+				 var checkStatus = table.checkStatus('idForTable')
+				 ,data = checkStatus.data;
+				 layer.alert(JSON.stringify(data));
+			},
+			getCheckLength: function(){ //获取选中数目
+				 var checkStatus = table.checkStatus('idForTable')
+				 ,data = checkStatus.data;
+				 layer.msg('选中了：'+ data.length + ' 个');
+			},
+			isAll: function(){ //验证是否全选
+				 var checkStatus = table.checkStatus('idForTable');
+				 layer.msg(checkStatus.isAll ? '全选': '未全选')
+			}
 		};
 	  	
 	  	$('.demoTable .layui-btn').on('click', function(){
@@ -84,6 +103,7 @@
 	  
       //监听工具条
         table.on('tool(filter)', function(obj){
+        	console.log(obj);
             var data = obj.data;
             if(obj.event === 'detail'){
                 layer.alert('ID：'+ data.id + ' 的查看操作');
@@ -113,7 +133,7 @@
                 layer.prompt({
                     formType: 2
                     ,title: '修改 ID 为 ['+ data.id +'] 的名称'
-                    ,value: data.uv
+                    ,value: data.name
                 }, function(value, index){
                     EidtUv(data,value,index,obj);
                    
@@ -126,21 +146,23 @@
             }
         });
 	});
-	
+		
 	function  EidtUv(data,value,index,obj) {
+		var categray = {"id":data.id, "name":value, "createTime":data.createTime};
 	    $.ajax({
 	        url: "/categray/update",
 	        type: "POST",
-	        data:{"uvid":data.id,"memthodname":"edituv","aid":data.aid,"uv":value},
+	        contentType: "application/json;charset=UTF-8",
+	        data:  JSON.stringify(categray),
 	        dataType: "json",
 	        success: function(data){
-
-	            if(data.state==1){
+				console.log(data);
+	            if(data.status==200){
 	               //关闭弹框
 	                layer.close(index);
 	                //同步更新表格和缓存对应的值
 	                obj.update({
-	                    uv: value
+	                    name: value
 	                });
 	                layer.msg("修改成功", {icon: 6});
 	            }else{
@@ -174,7 +196,8 @@
 	            success: function (data) {
 	            	console.log(data);
 	            	if(data.data == 'ok'){
-	            		layer.alert(data.data, {icon: 1});
+	            		/* layer.alert(data.data, {icon: 1}); */
+	            		location.reload();
 	            	}else{
 	            		layer.alert(data.data, {icon: 2});
 	            	}
