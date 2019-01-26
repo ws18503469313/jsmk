@@ -3,6 +3,8 @@ package com.itmuch.model;
 import java.util.Date;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Table(name = "ss_note")
 public class Note {
     @Id
@@ -17,13 +19,14 @@ public class Note {
     /**
      * 所属分类
      */
-    @Column(name = "category_id")
-    private String categoryId;
+    @Column(name = "categray_id")
+    private String categrayId;
 
     /**
      * 发布时间
      */
     @Column(name = "publish_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date publishTime;
 
     /**
@@ -35,7 +38,12 @@ public class Note {
      * 被喜欢次数
      */
     private Integer like;
-
+    
+    /**
+     * 是否被删除
+     */
+    @Column(name="is_delete")
+    private Boolean isDelete;
     /**
      * @return id
      */
@@ -59,25 +67,19 @@ public class Note {
 		this.name = name;
 	}
 
+	
+
+	
+
+	public String getCategrayId() {
+		return categrayId;
+	}
+
+	public void setCategrayId(String categrayId) {
+		this.categrayId = categrayId;
+	}
+
 	/**
-     * 获取所属分类
-     *
-     * @return category_id - 所属分类
-     */
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    /**
-     * 设置所属分类
-     *
-     * @param categoryId 所属分类
-     */
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    /**
      * 获取发布时间
      *
      * @return publish_time - 发布时间
@@ -130,4 +132,13 @@ public class Note {
     public void setLike(Integer like) {
         this.like = like;
     }
+
+	public Boolean getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(Boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+    
 }

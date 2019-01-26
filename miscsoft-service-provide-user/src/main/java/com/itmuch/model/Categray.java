@@ -17,7 +17,12 @@ public class Categray {
      * 分类名称
      */
     private String name;
-
+    
+    /**
+     * 是否被删除
+     */
+    @Column(name="is_delete")
+    private Integer isDelete;
     /**
      * 创建时间
      */
@@ -38,7 +43,8 @@ public class Categray {
     public void setId(String id) {
         this.id = id;
     }
-
+    
+    
     /**
      * 获取分类名称
      *
@@ -74,4 +80,12 @@ public class Categray {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+	public Integer getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
+	}
 }

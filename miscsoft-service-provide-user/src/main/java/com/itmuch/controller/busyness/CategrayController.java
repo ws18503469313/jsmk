@@ -30,23 +30,30 @@ public class CategrayController {
 	
 	@Autowired
 	private Resource resource;
+	
 	@Autowired
 	private CategrayService categrayService;
 	
 	@RequestMapping("list")
 	@ResponseBody
-	public JSONResult list(@RequestParam(name="page",defaultValue="0") int page, ModelMap map, Categray query) {
-		Page<Categray> obj = PageHelper.startPage(page,resource.getPagesize());
+	public JSONResult list(@RequestParam(name="page",defaultValue="0") int page, 
+							@RequestParam(name="open",defaultValue="true") Boolean open,
+							ModelMap map, Categray query) {
+		Page<Categray> obj = null;
+		if(open) {
+			obj = PageHelper.startPage(page,resource.getPagesize());
+		}
 		Example example = new Example(Categray.class);
 		Example.Criteria criteria = example.createCriteria();
 		if(!StringUtils.isEmpty(query.getName())) {
 			criteria.andLike("name", "%"+query.getName()+"%");
 		}
+		criteria.andEqualTo("isDelete", false);
 		List<Categray> result = categrayMapper.selectByExample(example);
 //		map.put("query", query);
 //		map.put("result", result);
 //		map.put("page", page);
-		return JSONResult.ok(result, obj.getTotal());
+		return JSONResult.ok(result, obj == null ? null :obj.getTotal());
 	}
 	
 	@RequestMapping("save")

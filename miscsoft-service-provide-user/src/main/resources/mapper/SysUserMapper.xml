@@ -20,7 +20,7 @@
 		LEFT JOIN sys_user_role sur on su.id = sur.user_id 
 		LEFT JOIN sys_role role on role.id = sur.role_id
 		where su.id = #{id}
-  </select>
+  </select>	
   
   <select id="getUserByUsername" parameterType="java.lang.String" resultType="com.itmuch.model.User">
   		SELECT * from sys_user where username = #{username}

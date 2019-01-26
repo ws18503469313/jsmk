@@ -11,7 +11,7 @@
   </resultMap>
   
   <select id="listRoleByUsername" parameterType="java.lang.String" resultType="java.lang.String">
-  	SELECT * from sys_user su 
+  	SELECT rolename from sys_user su 
 	LEFT JOIN sys_user_role sur on su.id = sur.user_id 
 	LEFT JOIN sys_role sr on sur.role_id = sr.id
 	where su.username = #{username}

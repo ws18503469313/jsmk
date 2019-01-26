@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>发帖</title>
+<link href="/lay/css/modules/laydate/default/laydate.css" />
+<link href="/lay/css/modules/layer/default/layer.css" />
+<link href="/lay/css/modules/code.css" />
+<link rel="stylesheet" href="/lay/css/layui.css" />
+
+</head>
+<body>
+	<h1>create</h1>
+	<form action="/note/save" class="layui-form" method="post"
+		enctype="multipart/form-data">
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">帖子标题</label>
+				<div class="layui-input-inline">
+					<input type="" name="name" lay-verify="required" autocomplete="off"
+						class="layui-input">
+				</div>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">下拉选择框</label>
+				<div class="layui-input-block">
+					<select id="categray" lay-search>
+					</select>
+				</div>
+			</div>
+		</div>
+
+	</form>
+	<script type="text/javascript" src="/lay/layui.all.js" />
+	<script type="text/javascript" src="/lay/layui.js" />
+	<script type="text/javascript"></script>
+	<script type="text/javascript">
+		layui.use([ 'jquery', 'form' ], function() {
+			var $ = layui.$, form = layui.form;
+			$.ajax({
+				type : "get",
+				url : "/categray/list?open="+false,
+				dateType : "json",
+				success : function(res) {
+					var data = res.data;
+					$('#categray').empty();
+					var t;
+					for (var i = 0; i < data.length; i++) {
+						t += "<option value="+data[i].id + ">" + data[i].name
+								+ "</option>";
+					}
+					$('#categray').append(t);
+					form.render('select');
+				}
+			})
+		});
+	</script>
+
+
+
+</body>
+</html>

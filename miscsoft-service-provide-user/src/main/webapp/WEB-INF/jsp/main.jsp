@@ -53,7 +53,7 @@
           <dl class="layui-nav-child">
             <dd><a href="${ctx }/html/main.html" target="option">测试1</a></dd>
             <dd><a href="${ctx }/html/categray/categray.html" target="option">菜单管理</a></dd>
-            <dd><a href="javascript:;">列表三</a></dd>
+            <dd><a href="${ctx }/html/note/note.html" target="option">发帖</a></dd>
             <dd><a href="">超链接</a></dd>
           </dl>
         </li>
