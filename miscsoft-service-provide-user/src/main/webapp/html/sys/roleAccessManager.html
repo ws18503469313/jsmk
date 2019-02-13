@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link href="/lay/css/modules/laydate/default/laydate.css">
+<link href="/lay/css/modules/layer/default/layer.css">
+<link href="/lay/css/modules/code.css">
+<link rel="stylesheet" href="/lay/css/layui.css">
+</head>
+<body>
+	<div id="RATree"></div>
+</body>
+
+<script type="text/javascript" src="/lay/layui.all.js"></script>
+<script type="text/javascript" src="/lay/layui.js"></script>
+<script type="text/javascript">
+layui.use(['jquery', 'authtree', 'form', 'layer'], function(){
+	var $ = layui.jquery;
+	var authtree = layui.authtree;
+	var form = layui.form;
+	var layer = layui.layer;
+	// 一般来说，权限数据是异步传递过来的
+	$.ajax({
+		url: '/access/listAccess',
+		dataType: 'json',
+		success: function(data){
+            var trees = data.data.trees;
+            // 如果后台返回的不是树结构，请使用 authtree.listConvert 转换
+            authtree.render('#LAY-auth-tree-index', trees, {
+				inputname: 'authids[]', 
+				layfilter: 'lay-check-auth', 
+				autowidth: true,
+			});
+        }
+    });
+});
+</script>
+</html>

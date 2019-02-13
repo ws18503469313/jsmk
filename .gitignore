@@ -1,6 +1,8 @@
 # Compiled class file
 *.class
 
+/miscsoft-service-provide-user/target/
+
 # Log file
 *.log
 

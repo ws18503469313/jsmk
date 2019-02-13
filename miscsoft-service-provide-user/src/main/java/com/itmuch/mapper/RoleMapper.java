@@ -8,4 +8,6 @@ import com.itmuch.util.MyMapper;
 public interface RoleMapper extends MyMapper<Role> {
 
 	Set<String> listRoleByUsername(String username);
+
+	String selectRoleIdByUserId(String userID);
 }

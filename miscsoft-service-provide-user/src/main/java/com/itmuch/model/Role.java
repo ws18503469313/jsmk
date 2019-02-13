@@ -9,7 +9,7 @@ public class Role {
 
     private String rolename;
 
-    private Integer descprit;
+    private String descprit;
 
     /**
      * @return id
@@ -39,11 +39,11 @@ public class Role {
         this.rolename = rolename;
     }
 
-	public Integer getDescprit() {
+	public String getDescprit() {
 		return descprit;
 	}
 
-	public void setDescprit(Integer descprit) {
+	public void setDescprit(String descprit) {
 		this.descprit = descprit;
 	}
     

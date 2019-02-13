@@ -58,11 +58,12 @@
           </dl>
         </li>
         <li class="layui-nav-item">
-          <a href="javascript:;">解决方案</a>
+          <a href="javascript:;">系统管理</a>
           <dl class="layui-nav-child">
-            <dd><a href="javascript:;">列表一</a></dd>
-            <dd><a href="javascript:;">列表二</a></dd>
-            <dd><a href="">超链接</a></dd>
+          	<dd><a target="option">人员管理</a></dd>
+            <dd><a href="${ctx }/html/sys/access.html" target="option">系统权限</a></dd>
+            <dd><a href="${ctx }/html/sys/role.html" target="option">角色管理</a></dd>
+            
           </dl>
         </li>
         <li class="layui-nav-item"><a href="">云市场</a></li>

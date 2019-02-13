@@ -1,21 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.itmuch.mapper.AccessMapper">
-  <resultMap id="BaseResultMap" type="com.itmuch.model.Access">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="url" jdbcType="VARCHAR" property="url" />
-    <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="created_time" jdbcType="VARCHAR" property="createdTime" />
-    <result column="type" jdbcType="VARCHAR" property="type" />
-  </resultMap>
-  
-  <select id="getAccessByRole" parameterType="java.lang.String" resultType="java.lang.String">
-  		SELECT sa.url from sys_role sr 
-		LEFT JOIN sys_role_access sra on sr.id = sra.role_id 
-		LEFT JOIN sys_access sa on sra.access_id = sa.id 
+	<resultMap id="BaseResultMap" type="com.itmuch.model.Access">
+		<!-- WARNING - @mbg.generated -->
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="url" jdbcType="VARCHAR" property="url" />
+		<result column="title" jdbcType="VARCHAR" property="title" />
+		<result column="created_time" jdbcType="VARCHAR"
+			property="createdTime" />
+	</resultMap>
+
+	<select id="getAccessByRole" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		SELECT sa.url from sys_role sr
+		LEFT JOIN sys_role_access sra
+		on sr.id = sra.role_id
+		LEFT JOIN sys_access sa on sra.access_id = sa.id
 		WHERE sr.rolename = #{ro}
-  </select>
+	</select>
+
+	<select id="getSysAccessTree" parameterType="java.lang.String"
+		resultType="com.itmuch.model.Access" resultMap="CustomerMap">
+		SELECT sa.id,sa.title,sa.url,sa.parent
+		FROM sys_access sa
+		LEFT JOIN sys_role_access sra ON sa.id = sra.access_id
+		LEFT JOIN
+		sys_user_role sur ON sur.role_id = sra.role_id
+		WHERE sur.user_id =
+		#{userID}
+	</select>
+	<!-- 订单及订单明细的resultMap 使用extends继承，不用再重复用户的映射 -->
+	<resultMap type="com.itmuch.model.Access" id="CustomerMap" extends="BaseResultMap">
+		<!-- 订单信息 -->
+		<!-- 用户信息 -->
+		<!-- 使用extends继承，不用在中配置订单信息和用户信息的映射 -->
+
+
+		<!-- 订单明细信息 一个订单关联查询出了多条明细，要使用collection进行映射 collection：对关联查询到多条记录映射到集合对象中 
+			property：将关联查询到多条记录映射到cn.itcast.mybatis.po.Orders哪个属性 ofType：指定映射到list集合属性中pojo的类型 -->
+		<collection property="children"
+			ofType="com.itmuch.model.Access">
+			<!-- id：订单明细唯 一标识 property:要将订单明细的唯 一标识 映射到cn.itcast.mybatis.po.Orderdetail的哪个属性 -->
+			<id column="child_id" property="id" />
+			<result column="child_url" property="url" />
+			<result column="child_title" property="title" />
+		</collection>
+
+
+	</resultMap>
 </mapper>

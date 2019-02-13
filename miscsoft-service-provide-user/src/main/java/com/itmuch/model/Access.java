@@ -1,32 +1,43 @@
 package com.itmuch.model;
 
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.*;
 
 @Table(name = "sys_access")
 public class Access {
     @Id
-    private Integer id;
+    private String id;
 
     private String url;
 
     private String title;
 
     @Column(name = "created_time")
-    private String createdTime;
-
-    private String type;
-
+    private Date createdTime;
+    
+    private String parent;
+    /**
+     * 二级菜单
+     */
+    private List<Access> children;
+    /**
+     * 用户是否拥有该权限
+     */
+    @Transient
+    private Boolean has;
     /**
      * @return id
      */
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * @param id
      */
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -61,28 +72,40 @@ public class Access {
     /**
      * @return created_time
      */
-    public String getCreatedTime() {
+    public Date getCreatedTime() {
         return createdTime;
     }
 
     /**
      * @param createdTime
      */
-    public void setCreatedTime(String createdTime) {
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    /**
-     * @return type
-     */
-    public String getType() {
-        return type;
-    }
+	public List<Access> getChildren() {
+		return children;
+	}
 
-    /**
-     * @param type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
+	public void setChildren(List<Access> children) {
+		this.children = children;
+	}
+
+	public Boolean getHas() {
+		return has;
+	}
+
+	public void setHas(Boolean has) {
+		this.has = has;
+	}
+
+	public String getParent() {
+		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+	
+   
 }

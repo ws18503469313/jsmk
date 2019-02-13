@@ -25,4 +25,8 @@
   		and id = #{id}
   	</if>
   </sql>
+  
+  <select id="selectRoleIdByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT role_id from sys_user_role where user_id = #{userId}  
+  </select>
 </mapper>

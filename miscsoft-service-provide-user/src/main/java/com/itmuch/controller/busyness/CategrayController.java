@@ -2,6 +2,7 @@ package com.itmuch.controller.busyness;
 
 import java.util.List;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -36,7 +37,7 @@ public class CategrayController {
 	
 	@RequestMapping("list")
 	@ResponseBody
-	public JSONResult list(@RequestParam(name="page",defaultValue="0") int page, 
+	public JSONResult list(@RequestParam(name="page",defaultValue="1") int page, 
 							@RequestParam(name="open",defaultValue="true") Boolean open,
 							ModelMap map, Categray query) {
 		Page<Categray> obj = null;
@@ -57,6 +58,7 @@ public class CategrayController {
 	}
 	
 	@RequestMapping("save")
+	@RequiresRoles(value="manager")
 	@ResponseBody
 	public JSONResult save(String name) {
 		String msg = categrayService.save(name);
