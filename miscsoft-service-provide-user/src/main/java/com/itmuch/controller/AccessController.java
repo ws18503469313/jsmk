@@ -31,14 +31,13 @@ public class AccessController extends CoreController{
 	/**
 	 * 获取某角色的权限
 	 * @param RoleID
-	 * @return
+	 * @return6
 	 */
 	@RequestMapping("getAccess")
 	@ResponseBody
-	public JSONResult getSysAccessTree(String RoleID) {
-		User user = getCurrentUser();
-		JSONArray tree = accessService.getSysAccessTree(user.getId(), RoleID);
-		log.debug("Tree--------------------------"+tree+"-----------------------------");
+	public JSONResult getSysAccessTree(String roleId) {
+		JSONArray tree = accessService.getSysAccessTree(null, roleId);
+		log.debug("Tree--------------------------\r\n"+tree+"\r\n-----------------------------");
 		return JSONResult.ok(tree);
 	}
 	

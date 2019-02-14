@@ -110,7 +110,6 @@
         
       //监听工具条
         table.on('tool(filter)', function(obj){
-        	console.log(obj);
             var data = obj.data;
             if(obj.event === 'accessManager'){
             	console.log('ID：'+ data.id + ' 的查看操作');
@@ -120,10 +119,16 @@
   	        	  fixed: false, //不固定
   	        	  btn: ['提交', '关闭'],
   	        	  maxmin: true,
-  	        	  content: '/role/roleAccessManager?roleId='+data.id,
+  	        	  content: 'roleAccessManager.html?roleId='+data.id,
   	        	  title: '权限管理',
+  	        	  success:function(layero, index){
+  	        		  // 获取子页面的iframe
+                      var iframe = window['layui-layer-iframe' + index];
+                      // 向子页面的全局函数child传参
+                      iframe.child(data.id);
+  	        	  },
   	        	  btn1:function(index,layero){
-  	        		  
+  	        			
   	        		  var detailForm = layer.getChildFrame('form', index);
   	        		  var url = $('#url', detailForm).val();//直接拿到子窗口的值
   	        		  var title = $('#title', detailForm).val();//直接拿到子窗口的值

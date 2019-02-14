@@ -44,4 +44,20 @@ public class FileUploadService {
 			throw new BizException("保存图片失败:" + e.getMessage(), e);
 		}
 	}
+	
+	public void write() {
+		File dir = new File(resource.getFilePath());
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+		if (!dir.exists()) {
+			throw new BizException("无法创建图片上传路径" + resource.getFilePath());
+		}
+		try {
+			System.out.println("---------------------"+MyWebUtils.getCtx());
+			FileUtils.writeByteArrayToFile(new File(dir, "123asdxa.txt"), "wadafgczc12312321321dcscaegffawd".getBytes());
+		}catch (IOException e) {
+			throw new BizException("保存图片失败:" + e.getMessage(), e);
+		}
+	}
 }

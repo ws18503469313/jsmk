@@ -9,28 +9,51 @@
 <link rel="stylesheet" href="/lay/css/layui.css">
 </head>
 <body>
-	<div id="RATree"></div>
+	<form class="layui-form">
+	    <div class="layui-form-item">
+	        <label class="layui-form-label">选择权限</label>
+	        <div class="layui-input-block">
+	            <div id="RATree"></div>
+	        </div>
+	    </div>
+	</form>
+	
 </body>
 
 <script type="text/javascript" src="/lay/layui.all.js"></script>
 <script type="text/javascript" src="/lay/layui.js"></script>
 <script type="text/javascript">
+var roleId = null;
+function child(obj) {
+	roleId = obj;
+}
 layui.use(['jquery', 'authtree', 'form', 'layer'], function(){
 	var $ = layui.jquery;
 	var authtree = layui.authtree;
 	var form = layui.form;
 	var layer = layui.layer;
+	console.log(roleId+"-------------------------------------------------");
 	// 一般来说，权限数据是异步传递过来的
+	//var trees = "[{ 'id': 1, 'name': '用户管理', 'pid': 0 },{ 'id': 2, 'name': '用户组管理', 'pid': 0 },{ 'id': 3, 'name': '角色管理', 'pid': 2 },{ 'id': 4, 'name': '添加角色', 'pid':  3},{ 'id': 5, 'name': '角色列表', 'pid': 3 },{ 'id': 6, 'name': '管理员管理', 'pid': 0 },{ 'id': 7, 'name': '添加管理员', 'pid': 6 },{ 'id': 8, 'name': '管理员列表', 'pid': 6 }]";
+	//var opt = "{'primaryKey':'id', 'parentKey':'pid'}";
 	$.ajax({
-		url: '/access/listAccess',
+		url: '/access/getAccess?roleId='+roleId,
 		dataType: 'json',
 		success: function(data){
-            var trees = data.data.trees;
+            var trees = data.data;
+            console.log(trees);
+            //authtree.listConvert(trees);
+            //authtree.listConvert(trees,opt);
             // 如果后台返回的不是树结构，请使用 authtree.listConvert 转换
-            authtree.render('#LAY-auth-tree-index', trees, {
+            authtree.render('#RATree', trees, {
 				inputname: 'authids[]', 
 				layfilter: 'lay-check-auth', 
 				autowidth: true,
+				autochecked:true,
+				autoclose: true,
+				nameKey:'name',
+				valuekey:'id'
+				
 			});
         }
     });

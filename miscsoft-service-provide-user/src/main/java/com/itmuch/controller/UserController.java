@@ -35,11 +35,11 @@ public class UserController {
 	@Autowired
 	private Sid sid;
 	
-	@RequestMapping("/{id}")
-	public User findById(@PathVariable String id) {
-		return userMapper.selectByPrimaryKey("1");
-		
-	}
+//	@RequestMapping("/{id}")
+//	public User findById(@PathVariable String id) {
+//		return userMapper.selectByPrimaryKey("1");
+//		
+//	}
 	@RequestMapping("/findByIdJSON")
 	public JSONResult findByIdJSON(String id) {
 		

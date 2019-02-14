@@ -2,6 +2,7 @@ package com.itmuch.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -100,7 +101,6 @@ public class AccessService {
 				JSONObject state = new JSONObject();
 				state.put("disabled", false);
 				state.put("opened", false);
-//				boolean contains = ;
 				state.put("selected", two.getHas());
 				second.put("state", state);
 				children.add(second);
@@ -135,59 +135,69 @@ public class AccessService {
 					continue;
 				}
 			}
-			/**
-			 * 
-			 */
 			if(one.getHas() == null) {
 				one.setHas(false);
 			}
 		}
 		/**
-		 * 将该用户拥有的access做成一个tree
+		 * 将该用户/该角色拥有的access做成一个tree
 		 */
+		//先找出一级菜单
 		for(Access one : allAccess) {
-			if(one.getUrl().equals("#")) {//先找出一级菜单
-				if(StringUtils.isNotBlank(userID)) {//如果用户id不为空,则说明是要获取该用户拥有的权限,
-					result.add(transToNode(one, one.getHas()));
+			if(one.getUrl().equals("#")) {
+				if(StringUtils.isNotBlank(userID) ) {//如果用户id不为空,则说明是要获取该用户拥有的权限,
+					if(one.getHas()) {//如果该用户有该权限,才显示
+						result.add(transToNode(one, one.getHas()));
+					}
 				}else {//如果用户id为空,则说明是给校色分配权限,则要获取所有的权限,
 					result.add(transToNode(one, one.getHas()));
 				}
-//				allAccess.remove(one);
 			}
 		}
+		//再找出一级菜单下的二级菜单
 		for (NodeDTO parent : result) {
 			List<NodeDTO> children = new ArrayList<>();
 			for(Access child : allAccess) {
 				if(child.getParent().equals(parent.getId())) {
-					children.add(transToNode(child, child.getHas()));
-//					allAccess.remove(child);
+					if(StringUtils.isNotBlank(userID)) {
+						if(child.getHas()) {//如果该用户有该权限,才显示
+							children.add(transToNode(child, child.getHas()));
+						}
+					}else {
+						children.add(transToNode(child, child.getHas()));
+					}
+					
 				}
 			}
 			parent.setChildren(children);
 		}
 		return transTreeTOJson(result);
 	}
-	
+	/**
+	 * 将用户/角色拥有的权限转化为tree
+	 * @param tree
+	 * @return
+	 */
 	private JSONArray transTreeTOJson(List<NodeDTO> tree) {
 		JSONArray result = new JSONArray();
-		for (NodeDTO one : tree) {
+		for (NodeDTO parent : tree) {//一级根菜单
 			JSONObject first = new JSONObject();
-			first.put("text", one.getName());
-			first.put("id", one.getId());
+			first.put("name", parent.getName());
+			first.put("value", parent.getUrl());
+			first.put("checked", parent.getHas());//checked
+			first.put("id", parent.getId());
+			first.put("pid", 0);
 			JSONArray children = new JSONArray();
-			for (NodeDTO two : one.getChildren()) {
+			for (NodeDTO child : parent.getChildren()) {//一级根菜单下的二级菜单
 				JSONObject second = new JSONObject();
-				second.put("text", two.getName());
-				second.put("id", two.getId());
-				JSONObject state = new JSONObject();
-				state.put("disabled", false);
-				state.put("opened", false);
-				boolean contains = two.getHas();
-				state.put("selected", contains);
-				second.put("state", state);
+				second.put("name", child.getName());
+				second.put("value", child.getUrl());
+				second.put("checked", child.getHas());
+				second.put("id", child.getId());
+				second.put("pid", parent.getId());
 				children.add(second);
 			}
-			first.put("children", children);
+			first.put("list", children);
 			result.add(first);
 		}
 		return result;

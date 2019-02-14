@@ -1,6 +1,7 @@
 package com.itmuch.controller.busyness;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,9 @@ public class CategrayController {
 	@RequestMapping("list")
 	@ResponseBody
 	public JSONResult list(@RequestParam(name="page",defaultValue="1") int page, 
-							@RequestParam(name="open",defaultValue="true") Boolean open,
-							ModelMap map, Categray query) {
-		Page<Categray> obj = null;
+							@RequestParam(name="open",defaultValue="true") Boolean open,//是否开启分页
+							 Categray query) {
+/*		Page<Categray> obj = null;
 		if(open) {
 			obj = PageHelper.startPage(page,resource.getPagesize());
 		}
@@ -51,9 +52,13 @@ public class CategrayController {
 		}
 		criteria.andEqualTo("isDelete", false);
 		List<Categray> result = categrayMapper.selectByExample(example);
-//		map.put("query", query);
+*
+*///		map.put("query", query);
 //		map.put("result", result);
 //		map.put("page", page);
+		Map<String, Object> map = categrayService.listCategray(query,open,page);
+		List<Categray> result = (List<Categray>) map.get("result");
+		Page<Categray> obj = (Page<Categray>) map.get("obj");
 		return JSONResult.ok(result, obj == null ? null :obj.getTotal());
 	}
 	

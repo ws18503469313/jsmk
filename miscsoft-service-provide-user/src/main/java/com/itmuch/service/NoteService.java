@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.itmuch.dto.NodeDTO;
 import com.itmuch.dto.NoteDTO;
 import com.itmuch.exception.BizException;
 import com.itmuch.mapper.NoteDetailMapper;
@@ -26,6 +29,9 @@ import tk.mybatis.mapper.entity.Example;
 @Service
 @Transactional
 public class NoteService {
+	
+	private static final Logger log = LoggerFactory.getLogger(NoteService.class);
+	
 	@Autowired
 	private NoteMapper noteMapper;
 	@Autowired
@@ -83,6 +89,15 @@ public class NoteService {
 		} catch (Exception e) {
 			throw new BizException("操作失败");
 		}
+	}
+	/**
+	 * 根据条件查询
+	 * @param id
+	 * @return
+	 */
+	public NoteDTO getNoteDetail(NoteDTO query) {
+		NoteDTO result = noteMapper.getNoteDetail(query);
+		return result;
 	}
 
 }
