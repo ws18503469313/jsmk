@@ -112,12 +112,12 @@
         table.on('tool(filter)', function(obj){
             var data = obj.data;
             if(obj.event === 'accessManager'){
-            	console.log('ID：'+ data.id + ' 的查看操作');
+//            	console.log('ID：'+ data.id + ' 的查看操作');
             	layer.open({
   	        	  type: 2,
   	        	  area: ['400px', '600px'],
   	        	  fixed: false, //不固定
-  	        	  btn: ['提交', '关闭'],
+//  	        	  btn: ['提交', '关闭'],
   	        	  maxmin: true,
   	        	  content: 'roleAccessManager.html?roleId='+data.id,
   	        	  title: '权限管理',
@@ -126,17 +126,17 @@
                       var iframe = window['layui-layer-iframe' + index];
                       // 向子页面的全局函数child传参
                       iframe.child(data.id);
-  	        	  },
-  	        	  btn1:function(index,layero){
-  	        			
-  	        		  var detailForm = layer.getChildFrame('form', index);
-  	        		  var url = $('#url', detailForm).val();//直接拿到子窗口的值
-  	        		  var title = $('#title', detailForm).val();//直接拿到子窗口的值
-  		  	           layer.close(index);
-  	        	  },
-  		          btn2: function(){
-  		       		  layer.closeAll();
-  		       	  }
+  	        	  }//,
+//  	        	  btn1:function(index,layero){
+//  	        			
+//  	        		  var detailForm = layer.getChildFrame('form', index);
+//  	        		  var url = $('#url', detailForm).val();//直接拿到子窗口的值
+//  	        		  var title = $('#title', detailForm).val();//直接拿到子窗口的值
+ // 		  	           layer.close(index);
+//  	        	  },
+//  		          btn2: function(){
+//  		       		  layer.closeAll();
+//  		       	  }
   	        	});
             } else if(obj.event === 'del'){
                 layer.confirm('真的删除行么', function(index){
@@ -214,22 +214,19 @@
 	 * index: 窗体本身
 	 */
 	function create() {
-		layer.prompt({title: '输入分类，并确认', formType: 2}, function(text, index){
-		    layer.close(index);
-		    layer.msg('演示完毕！您的口令：'+ text );
+		layer.prompt({title: '输入角色名称', formType: 2}, function(text, index){
+//		    console.log('演示完毕！您的口令：'+ text );
 		    $.ajax({
 	            type: "POST",
-	            url: "/categray/save",
-	            data: {'name':text},
+	            url: "/role/add",
+	            data: {'rolename':text},
 	            dateType:"json",
-	            
 	            success: function (data) {
-	            	console.log(data);
-	            	if(data.data == 'ok'){
-	            		/* layer.alert(data.data, {icon: 1}); */
+	            	if(data.status == 200){
+	            		layer.close(index);
 	            		location.reload();
 	            	}else{
-	            		layer.alert(data.data, {icon: 2});
+	            		layer.alert(data.msg, {icon: 2});
 	            	}
 	            }
 	            

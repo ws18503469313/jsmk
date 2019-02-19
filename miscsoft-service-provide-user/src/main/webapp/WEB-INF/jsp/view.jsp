@@ -10,14 +10,14 @@
 <head>
 <base href="<%=basePath%>">
 <title>jsp</title>
-<meta http-equiv="pragma" content="no-cache">
-<meta http-equiv="cache-control" content="no-cache">
-<meta http-equiv="expires" content="0">
-<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-<meta http-equiv="description" content="This is my page">
+<link href="/lay/css/modules/laydate/default/laydate.css">
+<link href="/lay/css/modules/layer/default/layer.css">
+<link href="/lay/css/modules/code.css">
+<link rel="stylesheet" href="/lay/css/layui.css">
 </head>
 <body>
 	<h1>view</h1>
+	<button onclick="login()">登陆</button>
 	<div>
 		<h2>分类</h2>
 		<ul>
@@ -42,4 +42,30 @@
 		</ul>
 	</div>
 </body>
+<script type="text/javascript" src="/lay/layui.all.js"></script>
+<script type="text/javascript" src="/lay/layui.js"></script>
+<script type="text/javascript">
+	function login() {
+		layer.open({
+        	  type: 2,
+        	  area: ['400px', '600px'],
+        	  fixed: false, //不固定
+        	  btn: ['登陆', '取消'],
+        	  maxmin: true,
+        	  content: '/html/login.html',
+        	  title: '用户登陆',
+        	  btn1:function(index,layero){
+        			
+        		  var detailForm = layer.getChildFrame('form', index);
+        		  var url = $('#url', detailForm).val();//直接拿到子窗口的值
+        		  var title = $('#title', detailForm).val();//直接拿到子窗口的值
+	  	           layer.close(index);
+        	  },
+	          btn2: function(){
+	       		  layer.closeAll();
+	       	  }
+        	});
+	}
+
+</script>
 </html>

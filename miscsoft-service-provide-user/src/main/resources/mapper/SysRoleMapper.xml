@@ -29,4 +29,18 @@
   <select id="selectRoleIdByUserId" parameterType="java.lang.String" resultType="java.lang.String">
 		SELECT role_id from sys_user_role where user_id = #{userId}  
   </select>
+  
+  <select id="checkIsExist" resultType="java.lang.String" parameterType="com.itmuch.model.Role">
+  		SELECT rolename FROM sys_role WHERE rolename = #{rolename}
+  </select>
+  
+  <select id="getHasAccess" parameterType="java.lang.String" resultType="String">
+  		SELECT access_id FROM sys_role_access WHERE role_id = #{roleId}
+  </select>
+  <delete id="deleteRoleAccess" parameterType="com.itmuch.dto.RoleAccessDTO">
+  		DELETE FROM sys_role_access where role_id = #{roleId} AND access_id = #{accessId}
+  </delete>
+  <insert id="saveRoleAccess" parameterType="com.itmuch.dto.RoleAccessDTO">
+  		INSERT INTO sys_role_access (id, role_id, access_id) VALUES (#{id},#{roleId},#{accessId})
+  </insert>
 </mapper>

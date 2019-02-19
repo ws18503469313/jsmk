@@ -171,29 +171,46 @@ public class AccessService {
 			}
 			parent.setChildren(children);
 		}
-		return transTreeTOJson(result);
+		if(StringUtils.isNotBlank(userID)) {
+			return transTreeTOJson(result, true);
+		}else {
+			return transTreeTOJson(result, false);
+		}
+		
 	}
 	/**
 	 * 将用户/角色拥有的权限转化为tree
+	 * 渲染的是jsonnode 的name
+	 * 渲染的input框中的value值为value
+	 * id 属性不渲染
 	 * @param tree
+	 * @param isTag 要返回什么样的树:true==前端主页tag树,false==角色管理权限树
 	 * @return
 	 */
-	private JSONArray transTreeTOJson(List<NodeDTO> tree) {
+	private JSONArray transTreeTOJson(List<NodeDTO> tree, boolean isTag) {
 		JSONArray result = new JSONArray();
 		for (NodeDTO parent : tree) {//一级根菜单
 			JSONObject first = new JSONObject();
 			first.put("name", parent.getName());
-			first.put("value", parent.getUrl());
+			if(isTag) {
+				first.put("value", parent.getUrl());
+			}else {
+				first.put("value", parent.getId());
+			}
+			
 			first.put("checked", parent.getHas());//checked
-			first.put("id", parent.getId());
 			first.put("pid", 0);
 			JSONArray children = new JSONArray();
 			for (NodeDTO child : parent.getChildren()) {//一级根菜单下的二级菜单
 				JSONObject second = new JSONObject();
 				second.put("name", child.getName());
-				second.put("value", child.getUrl());
+				if(isTag) {
+					second.put("value", child.getUrl());
+				}else {
+					second.put("value", child.getId());
+				}
+				
 				second.put("checked", child.getHas());
-				second.put("id", child.getId());
 				second.put("pid", parent.getId());
 				children.add(second);
 			}

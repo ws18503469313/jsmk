@@ -10,15 +10,15 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.itmuch.cache.RedisCacheManager;
-import com.itmuch.session.RedisSessionDao;
 import com.itmuch.shiro.CredentialsMatcher;
 import com.itmuch.shiro.UserRealm;
+
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 
 
 @Configuration
@@ -107,7 +107,10 @@ public class ShiroConfiguration {
         RedisCacheManager cacheManager = new RedisCacheManager();
         return  cacheManager;
     }
-    
+    @Bean
+    public ShiroDialect shiroDialect() {
+        return new ShiroDialect();
+    }
 //    /**
 //     * 限制同一账号登录同时登录人数控制
 //     *

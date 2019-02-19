@@ -37,7 +37,6 @@ public class AccessController extends CoreController{
 	@ResponseBody
 	public JSONResult getSysAccessTree(String roleId) {
 		JSONArray tree = accessService.getSysAccessTree(null, roleId);
-		log.debug("Tree--------------------------\r\n"+tree+"\r\n-----------------------------");
 		return JSONResult.ok(tree);
 	}
 	

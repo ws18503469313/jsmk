@@ -288,12 +288,29 @@ a:hover {
 		        return;  
 		    }  
 		   var id=$(this).parent().attr("id"); 
-		  
+		   console.log(id+"------------------accessId-------------")
 		 layer.confirm('确定要删除？该分类下的课程亦将删除！', {  
 		  btn: ['删除','取消']   
 		}, function(){  
-		      
+			console.log(id+"------------------accessId-------------")
+		      	return;
 		         //TODO 可以ajax到后台操作，这里只做模拟  
+		         $.ajax({
+		  		            type: "POST",
+		  		            url: "/access/delete",
+		  		            data: {'title':title,'url':url,'parent':parentUrl},
+		  		            dateType:"json",
+		  		          	async: false, 
+		  		            success: function (data) {
+		  		            	layer.alert(data.msg, {icon: 1});
+		  		            	id = data.data;
+		  		            },
+		  		            error: function (data) {
+		  		            	layer.alert(data.msg, {icon: 2});
+		  		            	return false;
+							}
+		  	            
+		  	       });
 		           layer.load(2);  
 		           setTimeout(function(){     
 		           layer.closeAll("loading");  

@@ -36,7 +36,7 @@
           贤心
         </a>
         <dl class="layui-nav-child">
-          <dd><a href="">基本资料</a></dd>
+          <dd><a href="/html/shiro.html">shiro测试</a></dd>
           <dd><a href="">安全设置</a></dd>
         </dl>
       </li>
@@ -66,8 +66,8 @@
             
           </dl>
         </li>
-        <li class="layui-nav-item"><a href="">云市场</a></li>
-        <li class="layui-nav-item"><a href="">发布商品</a></li>
+        <li class="layui-nav-item"><a href="/main/shiroTag" target="option">shiro测试jsp</a></li>
+        <li class="layui-nav-item"><a href="/html/shiro.html" target="option">shiro测试html</a></li>
       </ul>
     </div>
   </div>

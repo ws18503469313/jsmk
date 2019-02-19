@@ -50,6 +50,9 @@ public class BaseController {
 		return "redirect:/main/login";
 	}
 	
-	
+	@RequestMapping("/shiroTag")
+	public String shiroTag() {
+		return "shiro";
+	}
 	
 }
