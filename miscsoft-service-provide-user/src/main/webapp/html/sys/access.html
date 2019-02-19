@@ -286,21 +286,20 @@ a:hover {
 		    if(that.children("ul").length > 0){  
 		        layer.msg("该分类下含有子分类不能删除")  
 		        return;  
-		    }  
-		   var id=$(this).parent().attr("id"); 
-		   console.log(id+"------------------accessId-------------")
+		    }
+		    var accessName = $(this).siblings("a").children("cite").html();
+		    
+			console.log(accessName);
+		   var id=$(this).parent("li").children("cite").html(); 
 		 layer.confirm('确定要删除？该分类下的课程亦将删除！', {  
 		  btn: ['删除','取消']   
 		}, function(){  
-			console.log(id+"------------------accessId-------------")
-		      	return;
 		         //TODO 可以ajax到后台操作，这里只做模拟  
 		         $.ajax({
 		  		            type: "POST",
 		  		            url: "/access/delete",
-		  		            data: {'title':title,'url':url,'parent':parentUrl},
+		  		            data: {'name':accessName},
 		  		            dateType:"json",
-		  		          	async: false, 
 		  		            success: function (data) {
 		  		            	layer.alert(data.msg, {icon: 1});
 		  		            	id = data.data;

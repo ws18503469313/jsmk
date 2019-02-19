@@ -52,7 +52,8 @@ layui.use(['jquery', 'authtree', 'form', 'layer'], function(){
             //authtree.listConvert(trees,opt);
             // 如果后台返回的不是树结构，请使用 authtree.listConvert 转换
             authtree.render('#RATree', trees, {
-				inputname: 'authids[]', 
+            	openall: true,
+				inputname: 'authids', 
 				layfilter: 'lay-check-auth', 
 				autowidth: true,
 				autochecked:true,

@@ -127,16 +127,6 @@
                       // 向子页面的全局函数child传参
                       iframe.child(data.id);
   	        	  }//,
-//  	        	  btn1:function(index,layero){
-//  	        			
-//  	        		  var detailForm = layer.getChildFrame('form', index);
-//  	        		  var url = $('#url', detailForm).val();//直接拿到子窗口的值
-//  	        		  var title = $('#title', detailForm).val();//直接拿到子窗口的值
- // 		  	           layer.close(index);
-//  	        	  },
-//  		          btn2: function(){
-//  		       		  layer.closeAll();
-//  		       	  }
   	        	});
             } else if(obj.event === 'del'){
                 layer.confirm('真的删除行么', function(index){
@@ -166,12 +156,7 @@
                     ,value: data.name
                 }, function(value, index){
                     EidtUv(data,value,index,obj);
-                   
-
-
                 });
-
-
 
             }
         });

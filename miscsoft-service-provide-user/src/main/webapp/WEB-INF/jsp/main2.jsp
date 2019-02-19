@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,22 +48,6 @@
     <div class="layui-side-scroll">
       <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
       <ul class="layui-nav layui-nav-tree"  lay-filter="test">
-	      <c:forEach items="${tag }" var="n">
-	      		<li class="layui-nav-item " >
-	      			<a class="" href="${n.value }">${n.name }</a>
-	      			<dl class="layui-nav-child">
-	      				<c:forEach items="${n.list }" var="c">
-	      					<dd><a href="${ctx }/${c.value}" target="option">${c.name }</a></dd>
-	      				</c:forEach>
-	      			</dl>
-	      		</li>
-	      	
-	      </c:forEach>
-	    <li class="layui-nav-item"><a href="/main/shiroTag" target="option">shiro测试jsp</a></li>
-        <li class="layui-nav-item"><a href="/html/shiro.html" target="option">shiro测试html</a></li>
-     </ul>
-      
-<%--       
         <li class="layui-nav-item layui-nav-itemed">
           <a class="" href="javascript:;">所有商品</a>
           <dl class="layui-nav-child">
@@ -83,7 +66,9 @@
             
           </dl>
         </li>
- --%>       
+        <li class="layui-nav-item"><a href="/main/shiroTag" target="option">shiro测试jsp</a></li>
+        <li class="layui-nav-item"><a href="/html/shiro.html" target="option">shiro测试html</a></li>
+      </ul>
     </div>
   </div>
   

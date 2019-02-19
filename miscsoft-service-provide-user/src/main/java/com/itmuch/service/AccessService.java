@@ -2,7 +2,6 @@ package com.itmuch.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +18,7 @@ import com.itmuch.mapper.RoleMapper;
 import com.itmuch.model.Access;
 
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 public class AccessService {
@@ -222,6 +222,17 @@ public class AccessService {
 
 	private NodeDTO transToNode(Access one, boolean has) {
 		return new NodeDTO(one.getId(), one.getTitle(), one.getUrl(), has);
+	}
+	/**
+	 * 删除access
+	 * @param name
+	 */
+	public String deleteAccess(String name) {
+		Example example = new Example(Access.class);
+		Criteria criteria = example.createCriteria();
+		criteria.andEqualTo("title", name);
+		accessMapper.deleteByExample(example);
+		return "操作成功";
 	}
 
 	
