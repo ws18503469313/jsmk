@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,7 @@ public class BaseController extends CoreController{
 	
 	@Autowired
 	private AccessService accessService;
+	private static final Logger log = LoggerFactory.getLogger(BaseController.class);
 	/**
 	 * 登录方法
 	 * @param user
@@ -33,6 +36,7 @@ public class BaseController extends CoreController{
 	@RequestMapping("doLogin")
 	public String doLogin(User user) {
 		Subject subject = SecurityUtils.getSubject();
+		log.info("--------------检测登陆用户输入的信息-"+user.toString()+"-------------------------");
 		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
 		subject.login(token);
 		return "redirect:/main/index";

@@ -43,14 +43,14 @@ public class UserRealm extends AuthorizingRealm{
 	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		log.info("从db获取数据");
+		log.info("------------------------------------从db获取数据-----------------------------------------");
 		User user = (User)principals.getPrimaryPrincipal();
 		Set<String> roles = getRoleByUsername(user.getUsername());
 		Set<String> permission = getPermissionByRoles(roles);
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 		info.setRoles(roles);
 		info.setStringPermissions(permission);
-		log.info("授权：AuthorizationInfo--------------------------"+info+"-------------------------");
+		log.info("--------------------------授权完成-------------------------");
 		return info;
 	}
 	
@@ -68,7 +68,6 @@ public class UserRealm extends AuthorizingRealm{
 	}
 	
 	private Set<String> getRoleByUsername(String username) {
-		log.info("------------------------------------从db获取数据-----------------------------------------");
 		Set<String> roles = roleDao.listRoleByUsername(username);
 		log.info(roles.toString());
 		return roles;
@@ -86,9 +85,7 @@ public class UserRealm extends AuthorizingRealm{
 		}
 		
 		Md5Hash hash = new Md5Hash(token.getPassword(),username);
-		
-//		136fe14a93a03ade69d795b94fca0baa
-		
+		log.info("----------------------------------token.hash-"+hash+"-----------------");
 		if(!user.getPassword().equals(hash.toString())) {
 			throw new IncorrectCredentialsException("wrong password");
 		}
