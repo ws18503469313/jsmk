@@ -242,6 +242,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	
 	<build>
 		<resources>
 			<resource>
