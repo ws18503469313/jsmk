@@ -64,11 +64,11 @@ public class NoteService {
 	 */
 	public Map<String, Object> list(NoteDTO query,  int page) {
 		Page<Note> obj = PageHelper.startPage(page,resource.getPagesize());
-		Example example = new Example(Note.class);
-		Example.Criteria criteria = example.createCriteria();
-		if(!StringUtils.isEmpty(query.getName())) {
-			criteria.andLike("name", "%"+query.getName()+"%");
-		}
+//		Example example = new Example(Note.class);
+//		Example.Criteria criteria = example.createCriteria();
+//		if(!StringUtils.isEmpty(query.getName())) {
+//			criteria.andLike("name", "%"+query.getName()+"%");
+//		}
 		Map<String, Object> result = new HashMap<>();
 		List<NoteDTO> list = noteMapper.listNote(query);
 		result.put("list", list);

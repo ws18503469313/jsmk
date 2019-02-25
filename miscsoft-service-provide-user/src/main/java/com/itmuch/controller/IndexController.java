@@ -45,14 +45,15 @@ public class IndexController extends CoreController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/")
-	public String view(Map<String, Object> map) {
-		Map<String, Object> notes = noteService.list(new NoteDTO(), 1);
+	@RequestMapping(value="/")
+	public String view(NoteDTO note, Map<String, Object> map) {
+		Map<String, Object> notes = noteService.list(note, 1);
 		map.put("notes", notes.get("list"));
 		Map<String, Object> cate = categrayService.listCategray(new Categray(), false, 0);
 		map.put("categray", cate.get("result"));
 		return "view";
 	}
+	
 	/**
 	 * 帖子详情
 	 * @param id
@@ -64,6 +65,7 @@ public class IndexController extends CoreController{
 		map.put("note", noteDetail);
 		return "noteDetail";
 	}
+	
 	/**
 	 * 随便写一个文件,这个url没有用
 	 * @return

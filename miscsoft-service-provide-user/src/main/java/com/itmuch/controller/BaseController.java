@@ -12,11 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONArray;
 import com.itmuch.model.User;
 import com.itmuch.service.AccessService;
 import com.itmuch.service.RoleService;
+import com.itmuch.util.JSONResult;
 
 @Controller
 @RequestMapping("/main/")
@@ -34,12 +36,21 @@ public class BaseController extends CoreController{
 	 * @return
 	 */
 	@RequestMapping("doLogin")
-	public String doLogin(User user) {
+	public String doLogin(User user, HttpServletRequest req) {
 		Subject subject = SecurityUtils.getSubject();
-		log.info("--------------检测登陆用户输入的信息-"+user.toString()+"-------------------------");
 		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
 		subject.login(token);
+		req.getSession().setAttribute("user", getCurrentUser());
 		return "redirect:/main/index";
+	}	
+	@RequestMapping("ajaxLogin")
+	@ResponseBody
+	public JSONResult ajaxLogin(User user, HttpServletRequest req) {
+		Subject subject = SecurityUtils.getSubject();
+		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+		subject.login(token);
+		req.getSession().setAttribute("user", getCurrentUser());
+		return JSONResult.ok(getCurrentUser());
 	}
 	/**
 	 * 返回主页,并返回权限树

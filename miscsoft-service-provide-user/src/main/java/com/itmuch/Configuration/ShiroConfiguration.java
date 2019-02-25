@@ -33,13 +33,20 @@ public class ShiroConfiguration {
         ShiroFilterFactoryBean bean=new ShiroFilterFactoryBean();
         bean.setSecurityManager(manager);
         //配置登录的url和登录成功的url
-        bean.setLoginUrl("/main/login");
+        bean.setLoginUrl("/index/");
         bean.setSuccessUrl("/main/index");
         //配置访问权限
         LinkedHashMap<String, String> filterChainDefinitionMap=new LinkedHashMap<>();
+        filterChainDefinitionMap.put("/js/**", "anon");
+        filterChainDefinitionMap.put("/css/**", "anon");
+        filterChainDefinitionMap.put("/lay/**", "anon");
+        filterChainDefinitionMap.put("/common/**", "anon");//addUser
         filterChainDefinitionMap.put("/index", "anon");
+        filterChainDefinitionMap.put("/html/*.html", "anon");
         filterChainDefinitionMap.put("/index/*", "anon"); 
+        filterChainDefinitionMap.put("/addUser", "anon"); 
         filterChainDefinitionMap.put("/main/doLogin", "anon"); 
+        filterChainDefinitionMap.put("/main/ajaxLogin", "anon");
         filterChainDefinitionMap.put("/main/login", "anon"); //表示可以匿名访问
         filterChainDefinitionMap.put("/logout*","anon");
         filterChainDefinitionMap.put("/*", "authc");//表示需要认证才可以访问
@@ -56,7 +63,7 @@ public class ShiroConfiguration {
      */
     @Bean(name="securityManager")
     public SecurityManager securityManager(@Qualifier("authRealm") UserRealm authRealm) {
-        log.debug("--------------shiro已经加载----------------");
+//        log.debug("--------------shiro已经加载----------------");
         DefaultWebSecurityManager manager=new DefaultWebSecurityManager();
         manager.setRealm(authRealm);
         manager.setCacheManager(redisCacheManager());

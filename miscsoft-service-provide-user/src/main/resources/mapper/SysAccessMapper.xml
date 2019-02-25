@@ -26,4 +26,13 @@
 		LEFT JOIN sys_role_access sra ON sa.id = sra.access_id
 		WHERE sra.role_id = #{roleId}
 	</select>
+	<select id="selectAccessChildren" parameterType="java.lang.String" resultType="com.itmuch.model.Access">
+		SELECT id FROM sys_access where parent = #{id}
+	</select>
+	<delete id="deleteRoleAccessByAccessId" parameterType="java.lang.String">
+		DELETE FROM sys_role_access WHERE access_id =#{id}
+	</delete>
+	<delete id="deleteAccessByParentId" parameterType="java.lang.String">
+		DELETE FROM sys_access WHERE parent = ${id}
+	</delete>
 </mapper>

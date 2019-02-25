@@ -2,6 +2,8 @@ package com.itmuch.util;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itmuch.model.Categray;
@@ -228,9 +230,19 @@ public class JSONResult {
 	public void setOk(String ok) {
 		this.ok = ok;
 	}
-
+	
 
 	
+
+	public String toString( ) {
+		JSONObject result = new JSONObject();
+		result.put("msg", msg);
+		result.put("ok", ok);
+		result.put("data", data);
+		result.put("total", total);
+		result.put("status", status);
+		return result.toJSONString();
+	}
 	
 	
 	

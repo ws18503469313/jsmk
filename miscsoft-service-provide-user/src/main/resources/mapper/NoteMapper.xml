@@ -32,7 +32,10 @@
 
 
 	</resultMap>
-  
+  <!-- 要用此sql:
+  		1.ss_categray必须起别名为ca
+  		2.ss_note==========nt
+   -->
   <sql id="common">
   	<if test="id!=null and id!=''">
   		AND nt.id = #{id}

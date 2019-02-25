@@ -1,14 +1,15 @@
 package com.itmuch.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.n3r.idworker.Sid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -52,12 +53,17 @@ public class RoleController extends CoreController{
 	public JSONResult add(Role role) {
 		Role exist = roleMapper.checkIsExist(role);
 		if(exist != null) {
-			throw new BizException("改角色名称已存在");
+			throw new BizException("该角色名称已存在");
 		}
-		String id = sid.nextShort();
-		role.setId(id);
-		roleMapper.insert(role);
-		return JSONResult.ok(role);
+		if(StringUtils.isBlank(role.getId())) {
+			String id = sid.nextShort();
+			role.setId(id);
+			roleMapper.insert(role);
+			return JSONResult.ok(role);
+		}else {
+			roleMapper.updateByPrimaryKeySelective(role);
+			return JSONResult.ok(role);
+		}
 	}
 	/**
 	 *	分页列出role
@@ -90,5 +96,14 @@ public class RoleController extends CoreController{
 		log.info("--------------------修改角色权限-----------------操作人"+getCurrentUser().getName());
 		String result = roleSerive.saveRoleAccess(roleId, ids);
 		return JSONResult.ok(result);
+	}
+	
+	@RequestMapping("addRole")
+	public String addRole(String id,Map<String, Object> map) {
+		if(StringUtils.isNotBlank(id)) {
+			Role role = roleMapper.selectByPrimaryKey(id);
+			map.put("role", role);
+		}
+		return "sys/addRole";
 	}
 }

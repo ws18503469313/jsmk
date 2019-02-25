@@ -86,7 +86,7 @@ public class ViewResolverConfiguration {
 			registry.addResourceHandler("/res/**").addResourceLocations("/res/").setCachePeriod(36000000);
 			registry.addResourceHandler("/js/**").addResourceLocations("/js/").setCachePeriod(36000000);
 			registry.addResourceHandler("/css/**").addResourceLocations("/css/").setCachePeriod(36000000);
-			registry.addResourceHandler("/img/**").addResourceLocations("/img/").setCachePeriod(36000000);
+			registry.addResourceHandler("/images/**").addResourceLocations("/images/").setCachePeriod(36000000);
 			registry.addResourceHandler("/favicon.ico").addResourceLocations("/favicon.ico").setCachePeriod(36000000);
 			super.addResourceHandlers(registry);
 		}

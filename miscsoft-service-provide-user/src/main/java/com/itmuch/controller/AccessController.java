@@ -50,8 +50,7 @@ public class AccessController extends CoreController{
 	@ResponseBody
 	public JSONResult delete(String name) {
 		log.debug("---------------------------------"+name+"---------------------------");
-		accessService.deleteAccess(name);
-		return JSONResult.ok();
+		return JSONResult.ok(accessService.deleteAccess(name));
 	}
 	/**
 	 * 获取系统的中全部权限

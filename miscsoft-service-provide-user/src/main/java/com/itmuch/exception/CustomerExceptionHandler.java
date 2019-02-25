@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.itmuch.util.MyWebUtils;
 /**
  * 	<pre>
  *	 统一异常处理,
@@ -30,7 +31,7 @@ public class CustomerExceptionHandler {
 	public Object errorHandler(HttpServletRequest reqest, HttpServletResponse response, Exception e) throws Exception {
 		e.printStackTrace();
 		log.error("error_message---------------------" + e.getMessage());
-		if (isAjax(reqest)) {
+		if (MyWebUtils.isAjax(reqest)) {
 
 			JSONObject json = new JSONObject();
         	json.put("success", false);
@@ -50,8 +51,4 @@ public class CustomerExceptionHandler {
 	}
 
 	
-	public static boolean isAjax(HttpServletRequest httpRequest) {
-		return (httpRequest.getHeader("X-Requested-With") != null
-				&& "XMLHttpRequest".equals(httpRequest.getHeader("X-Requested-With").toString()));
-	}
 }

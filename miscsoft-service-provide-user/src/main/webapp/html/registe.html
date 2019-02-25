@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link href="/lay/css/modules/laydate/default/laydate.css">
+<link href="/lay/css/modules/layer/default/layer.css">
+<link href="/lay/css/modules/code.css">
+<link rel="stylesheet" href="/lay/css/layui.css">
+</head>
+<body>
+	<form class="layui-form" action="">
+		<div class="layui-form-item">
+			<label class="layui-form-label">账户</label>
+			<div class="layui-input-inline">
+				<input type="text" id="username" name="username" required lay-verify="required" placeholder="请输入手机号/邮箱账号" 
+				autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">密码</label>
+			<div class="layui-input-inline">
+				<input type="password" id="password" name="password" required lay-verify="required" placeholder="请输入密码" 
+				autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">确认密码</label>
+			<div class="layui-input-inline">
+				<input type="password" id="confirm" required lay-verify="required" placeholder="请输入密码" 
+				autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">昵称</label>
+			<div class="layui-input-inline">
+				<input type="text" id="name" name="name" required lay-verify="required" placeholder="请输入昵称" 
+				autocomplete="off" class="layui-input">
+			</div>
+		</div>
+	</form>
+
+</body>
+<script type="text/javascript" src="/lay/layui.all.js"></script>
+<script type="text/javascript" src="/lay/layui.js"></script>
+<script>
+function subform() {
+	layui.use('jquery', function(){
+		var $  = layui.jquery;
+		var password = $("#password").val();
+	  	var confirm = $('#confirm').val();
+	  	if(password != confirm){
+	  	  layer.alert("两次输入密码不一致", {icon: 2});
+	  	  return false;
+	  	}
+	  	var username = $('#username').val();
+	  	var name = $('#name').val();
+	  	console.log(username);
+	  	console.log(name);
+	  	if(username == "" || name =="" ){
+		  	  layer.alert("请补全信息", {icon: 2});
+		  	  return false;
+		} 
+	  	$.ajax({
+		  	url: "/addUser",
+	        type: "POST",
+	        data: {'username':username, 'password':password,'name':name},
+	        dateType:"json",
+	        success: function (result) {
+	        	console.log(result+"-----------------------------------");
+	        	if(result.status == 200){
+	        		layer.close(index);
+	            	layer.alert(result.msg, {icon: 1});
+	        	}else{
+	        		layer.alert(result.msg, {icon: 2});
+	            	return false;
+	        	}
+	        	
+	        },
+	        error: function (result) {
+	        	console.log(result+"-----------------------------------");
+			}
+	    
+		});
+	})
+}
+//Demo
+/* layui.use('form', function(){
+	
+  
+	var form = layui.form, $ = layui.$;
+    //监听提交
+  	form.on('submit(formDemo)', function(data){
+  		var password = $("#password").val();
+	  	var confirm = $('#confirm').val();
+	  	if(password != confirm){
+	  	  layer.alert("两次输入密码不一致", {icon: 2});
+	  	  return false;
+	  	}else{
+		  	
+		  	var data = JSON.stringify(data.field);
+		  	console.log(data);
+		  	var index = parent.layer.getFrameIndex(window.name);
+		  	$.ajax({
+			  	url: "/addUser",
+	            type: "POST",
+	            data: {'json':data},
+	            dateType:"json",
+	            success: function (result) {
+	            	console.log(result+"-----------------------------------");
+	            	if(data.status == 200){
+	            		layer.close(index);
+		            	layer.alert(result.msg, {icon: 1});
+	            	}else{
+	            		layer.alert(result.msg, {icon: 2});
+		            	return false;
+	            	}
+	            	
+	            },
+	            error: function (result) {
+	            	console.log(result+"-----------------------------------");
+				}
+	        
+	    	});
+	  	}
+  	});
+}); */
+</script>
+</html>

@@ -46,7 +46,7 @@ public class JedisConfiguration {
 	@Bean
 	public JedisPool redisPoolFactory()  throws Exception{
 		
-	    log.info("redis地址：" + host + ":" + port);
+//	    log.info("redis地址：" + host + ":" + port);
 	    JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
 	    jedisPoolConfig.setMaxIdle(maxIdle);
 	    jedisPoolConfig.setMaxWaitMillis(maxWaitMillis);
@@ -55,9 +55,9 @@ public class JedisConfiguration {
 	    // 是否启用pool的jmx管理功能, 默认true
 	    jedisPoolConfig.setJmxEnabled(true);
 	    JedisPool jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout, null);
-	    Jedis test = jedisPool.getResource();
-	    log.info("----------------------------JedisPool注入成功！！"+test+"-----------------------------");
-	    test.close();
+//	    Jedis test = jedisPool.getResource();
+//	    log.info("----------------------------JedisPool注入成功！！-----------------------------");
+//	    test.close();
 	    return jedisPool;
 	}
 }

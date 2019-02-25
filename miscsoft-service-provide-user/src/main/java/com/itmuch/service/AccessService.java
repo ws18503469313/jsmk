@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -225,13 +226,41 @@ public class AccessService {
 	}
 	/**
 	 * 删除access
+	 * 需要先判断该access是一级菜单还是二级菜单
+	 * 	一级菜单:获取子菜单,删除子菜单的role--access关系,并删除子菜单,最后再删除该一级菜单
+	 *  二级菜单:删除二级菜单的role--access关系,最后删除该二级菜单
 	 * @param name
 	 */
+	@Transactional
 	public String deleteAccess(String name) {
+		if(StringUtils.isBlank(name)) {
+			throw new BizException("请选择正确的权限");
+		}
 		Example example = new Example(Access.class);
 		Criteria criteria = example.createCriteria();
 		criteria.andEqualTo("title", name);
-		accessMapper.deleteByExample(example);
+//		accessMapper.deleteByExample(example);
+		List<Access> dbs = accessMapper.selectByExample(example);
+		if(dbs == null || dbs.size() < 0) {
+			throw new BizException("选择的权限不存在");
+		}
+		Access access = dbs.get(0);
+		if(access.getParent().equals("#") //先判断是一级菜单
+				|| access.getParent().equals("")
+				|| access.getUrl().equals("#")) {
+			List<Access> children = accessMapper.selectAccessChildren(access.getId());
+			for (Access child : children) {
+				accessMapper.deleteRoleAccessByAccessId(child.getId());
+//				accessMapper.deleteByPrimaryKey(child.getId());
+			}
+			/*
+			 * 这样操作可以一次性删除多条二级菜单,而减少db操作
+			 */
+			accessMapper.deleteAccessByParentId(access.getId());
+		}
+		accessMapper.deleteRoleAccessByAccessId(access.getId());
+		accessMapper.deleteByPrimaryKey(access.getId());
+		
 		return "操作成功";
 	}
 

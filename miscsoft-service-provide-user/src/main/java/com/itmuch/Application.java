@@ -25,9 +25,9 @@ public class Application extends SpringBootServletInitializer {
 	private static final Logger log = LoggerFactory.getLogger(Application.class);
 
 	public static void main(String[] args) {
-		long start = System.currentTimeMillis();
+//		long start = System.currentTimeMillis();
 		SpringApplication.run(Application.class, args);
-		log.info("started, took " + (System.currentTimeMillis() - start) + "ms");
+//		log.info("started, took " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	// @Bean
