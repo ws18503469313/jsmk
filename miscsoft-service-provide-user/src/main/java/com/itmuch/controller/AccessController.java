@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONArray;
+import com.itmuch.mapper.AccessMapper;
 import com.itmuch.model.Access;
 import com.itmuch.service.AccessService;
 import com.itmuch.util.JSONResult;
@@ -22,12 +23,13 @@ public class AccessController extends CoreController{
 	
 	@Autowired
 	private AccessService accessService;
-	
+	@Autowired
+	private AccessMapper accessMapper;
 	@RequestMapping("save")
 	@ResponseBody
 	public JSONResult save(Access access) {
-		String msg = accessService.save(access);
-		return new JSONResult(0, msg, msg);
+		Access msg = accessService.save(access);
+		return  JSONResult.ok(msg);
 	}
 	/**
 	 * 获取某角色的权限
@@ -61,5 +63,16 @@ public class AccessController extends CoreController{
 	public JSONResult listAccess() {
 		JSONArray tree = accessService.getSysAccessTree();
 		return JSONResult.ok(tree);
+	}
+	/**
+	 * 获取某一个权限详情
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping("detail")
+	@ResponseBody
+	public JSONResult detail(String id) {
+		Access access = accessMapper.selectByPrimaryKey(id);
+		return JSONResult.ok(access);
 	}
 }

@@ -45,7 +45,7 @@ a:hover {
 
 	<div style="height: 100%;">
 		<div class="panel panel-default"
-			style="position: fixed; width: 250px; height: 800px; overflow: auto;">
+			style="position: fixed; width: 500px; height: 800px; overflow: auto;">
 			<div class="panel-body" style="">
 				<h4 style="text-align: center;">权限管理</h4>
 				<ul unselectable="on" id="demo"
@@ -92,30 +92,9 @@ a:hover {
           //初始化layer.tree  
            var tree = layui.tree({  
               elem: '#demo',  
-              
+              area: ['700px', '950px'],
               check: 'checkbox',
-              nodes:  access/* [ //节点
-            		  {
-            			name: '常用文件夹',
-            			id: 1,
-            			alias: 'changyong',
-            			href: 'http://www.baidu.com',
-            			children: [{
-            				name: '所有未读',
-            				id: 11,
-            				href: '#',
-            				alias: 'weidu'
-            			}, {
-            				name: '置顶邮件',
-            				href: '#',
-            				id: 12
-            			}, {
-            				name: '标签邮件',
-            				href: '#',
-            				id: 13
-            			}]
-            		} 
-            	]       */
+              nodes:  access
             });   
             
             window.onload=function(){  
@@ -220,7 +199,7 @@ a:hover {
 		  		          	async: false, 
 		  		            success: function (data) {
 		  		            	layer.alert(data.msg, {icon: 1});
-		  		            	id = data.data;
+		  		            	id = data.data.id;
 		  		            },
 		  		            error: function (data) {
 		  		            	layer.alert(data.msg, {icon: 2});
@@ -256,28 +235,68 @@ a:hover {
 		       		  layer.closeAll();
 		       	  }
 	        });
-		  
-		              
-		})  
+		})
+		
+		
 		//重命名  
-		$("ul#demo ").on("click","li .edit",function(){  
-		   var node=$(this).parent().children("a").children("cite");  
-		   var id=$(this).parent().attr("id")  
-		   var that= $(this).closest("li");  
-		    layer.prompt({title: '输入新的分类名称，并确认',value:node.text(), formType:0}, function(text, index){  
-		         layer.close(index);  
-		           
-		         //TODO 可以ajax到后台操作，这里只做模拟  
-		        
-		         
-		         layer.load(2);  
-		         setTimeout(function(){     
-		         layer.closeAll("loading");  
-		          node.text(text);  
-		         },1000)  
-		          });   
-		            
-		          
+		$("ul#demo ").on("click","li .edit",function(){
+//			console.log($(this).html());
+//			console.log($(this).parent().children('a').attr('href')); 
+//			console.log($(this).parent().children(1).children('cite').html());
+			var id = $(this).parent().children('a').attr('href');
+			var obj = $(this).parent().children(1).children('cite');
+			layer.open({
+	        	  type: 2,
+	        	  //area: ['700px', '450px'],
+	        	  fixed: false, //不固定
+	        	  btn: ['提交', '关闭'],
+	        	  maxmin: true,
+	        	  content: 'createAccess.html',
+	        	  title: '添加url',
+	        	  success:function(layero, index){
+	        		  var detailForm = layer.getChildFrame('form', index);
+	        		  
+	        		  $.ajax({
+	        			  type: "POST",
+	        			  url: '/access/detail',
+	        			  data: {'id': id},
+	        			  dateType: 'json',
+	        			  success: function(data){
+	        				  $('#url', detailForm).val(data.data.url);
+	        				  $('#title', detailForm).val(data.data.title);
+	        			  }
+	        		  })
+//	        		  $('#title', detailForm).val(title);
+  	        	  },
+	        	  btn1:function(index,layero){
+	        		  var detailForm = layer.getChildFrame('form', index);
+	        		  var url = $('#url', detailForm).val();//直接拿到子窗口的值
+	        		  var title = $('#title', detailForm).val();//直接拿到子窗口的值
+	                  $.ajax({
+		  		            type: "POST",
+		  		            url: "/access/save",
+		  		            data: {'title':title,'url':url,'id':id},
+		  		            dateType:"json",
+		  		          	async: false, 
+		  		            success: function (data) {
+		  		            	console.log(obj);
+		  		            	obj.html(data.data.title);
+		  		            	layer.close(index);
+		  		            	layer.alert(data.msg, {icon: 1});
+		  		            	
+		  		            },
+		  		            error: function (data) {
+		  		            	layer.alert(data.msg, {icon: 2});
+		  		            	return false;
+							}
+		  	            
+		  	          });
+	        	  },
+	        	  btn2: function(){
+		       		  layer.closeAll();
+		       	  }
+	        });
+	        	
 		})  
 		//删除分类  
 		$("ul#demo ").on("click","li .del",function(){  

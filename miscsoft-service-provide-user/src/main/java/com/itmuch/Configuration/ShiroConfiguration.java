@@ -37,18 +37,22 @@ public class ShiroConfiguration {
         bean.setSuccessUrl("/main/index");
         //配置访问权限
         LinkedHashMap<String, String> filterChainDefinitionMap=new LinkedHashMap<>();
+        //静态资源
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/css/**", "anon");
         filterChainDefinitionMap.put("/lay/**", "anon");
         filterChainDefinitionMap.put("/common/**", "anon");//addUser
+        //主页
         filterChainDefinitionMap.put("/index", "anon");
         filterChainDefinitionMap.put("/html/*.html", "anon");
         filterChainDefinitionMap.put("/index/*", "anon"); 
         filterChainDefinitionMap.put("/addUser", "anon"); 
+        //登陆
         filterChainDefinitionMap.put("/main/doLogin", "anon"); 
         filterChainDefinitionMap.put("/main/ajaxLogin", "anon");
         filterChainDefinitionMap.put("/main/login", "anon"); //表示可以匿名访问
         filterChainDefinitionMap.put("/logout*","anon");
+        //后台
         filterChainDefinitionMap.put("/*", "authc");//表示需要认证才可以访问
         filterChainDefinitionMap.put("/**", "authc");//表示需要认证才可以访问
         filterChainDefinitionMap.put("/*.*", "authc");

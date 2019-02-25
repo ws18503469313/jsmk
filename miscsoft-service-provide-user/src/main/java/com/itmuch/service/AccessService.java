@@ -31,7 +31,7 @@ public class AccessService {
 	private AccessMapper accessMapper;
 	@Autowired
 	private RoleMapper roleMapper;
-	public String save(Access trans) {
+	public Access save(Access trans) {
 		if(trans.getId() ==null) {
 			if(StringUtils.isBlank(trans.getUrl())) {
 				throw new BizException("请输入url");
@@ -49,17 +49,17 @@ public class AccessService {
 			trans.setId(sid.nextShort());
 			trans.setCreatedTime(new Date());
 			accessMapper.insert(trans);
-			return trans.getId();
+			return trans;
 		}else {
-			Access db = accessMapper.selectByPrimaryKey(trans.getId());
-			if(StringUtils.isNotBlank(trans.getTitle())) {
-				db.setTitle(trans.getTitle());
-			}
-			if(StringUtils.isNotBlank(trans.getUrl())) {
-				db.setUrl(trans.getUrl());
-			}
-			accessMapper.updateByPrimaryKeySelective(db);
-			return "ok";
+//			Access db = accessMapper.selectByPrimaryKey(trans.getId());
+//			if(StringUtils.isNotBlank(trans.getTitle())) {
+//				db.setTitle(trans.getTitle());
+//			}
+//			if(StringUtils.isNotBlank(trans.getUrl())) {
+//				db.setUrl(trans.getUrl());
+//			}
+			accessMapper.updateByPrimaryKeySelective(trans);
+			return trans;
 		}
 	}
 	/**
@@ -91,14 +91,15 @@ public class AccessService {
 		for (NodeDTO one : tree) {
 			JSONObject first = new JSONObject();
 			first.put("name", one.getName());
-//			first.put("href", "#");
+			//因为,layui树渲染过程中没有id属性,所以将href替换为id
+			first.put("href", one.getId());
 			first.put("id", one.getId());
 			JSONArray children = new JSONArray();
 			for (NodeDTO two : one.getChildren()) {
 				JSONObject second = new JSONObject();
 				second.put("name", two.getName());
 				second.put("id", two.getId());
-//				second.put("href", two.getUrl());
+				second.put("href", two.getId());
 				JSONObject state = new JSONObject();
 				state.put("disabled", false);
 				state.put("opened", false);
