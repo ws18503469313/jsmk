@@ -248,6 +248,19 @@
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.7</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.dyuproject.protostuff</groupId>
+			<artifactId>protostuff-core</artifactId>
+			<version>1.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dyuproject.protostuff</groupId>
+			<artifactId>protostuff-runtime</artifactId>
+			<version>1.0.8</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<dependencyManagement>
@@ -261,7 +274,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<build>
 		<resources>
 			<resource>

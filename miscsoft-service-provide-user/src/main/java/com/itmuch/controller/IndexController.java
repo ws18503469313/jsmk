@@ -30,6 +30,7 @@ import com.itmuch.service.ImageService;
 import com.itmuch.service.NoteService;
 import com.itmuch.service.UserService;
 import com.itmuch.util.JSONResult;
+import com.itmuch.util.JedisUtil;
 import com.itmuch.util.WebParamUtils;
 
 @Controller
@@ -44,6 +45,7 @@ public class IndexController extends CoreController{
 	private FileUploadService fileUpLoadService;
 	@Autowired
 	private Resource resource;
+	
 	/**
 	 * 用户默认访问首页
 	 * @param map
@@ -69,7 +71,7 @@ public class IndexController extends CoreController{
 	 */
 	@RequestMapping("/detail")
 	public String viewDetail(NoteDTO query, Map<String, Object> map) {
-		NoteDTO noteDetail = noteService.getNoteDetail(query);
+		NoteDTO noteDetail = noteService.getNoteDetail(query, false);
 		map.put("note", noteDetail);
 		return "noteDetail";
 	}

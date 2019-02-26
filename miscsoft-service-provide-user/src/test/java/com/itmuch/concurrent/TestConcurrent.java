@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.junit.Test;
+
 import com.itmuch.BaseTests;
 /**
  * 即如果高并发情况下,要将事务加锁,必须将整个事务都加上,
@@ -15,10 +17,7 @@ import com.itmuch.BaseTests;
 public class TestConcurrent extends BaseTests {
 	
 	
-	public static void main(String[] args) {
-		TestConcurrent test = new TestConcurrent();
-		test.startThread();
-	}
+	@Test
 	private void startThread() {
 		for (int i = 0; i < 5000; i++) {
 			ThreadConnector connector = new ThreadConnector();

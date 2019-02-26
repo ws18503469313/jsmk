@@ -1,13 +1,19 @@
 package com.itmuch.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Table(name = "ss_note")
-public class Note {
-    @Id
+public class Note implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1173274734490147752L;
+
+	@Id
     private String id;
 
     /**
@@ -151,5 +157,16 @@ public class Note {
 	public void setVisitNum(Long visitNum) {
 		this.visitNum = visitNum;
 	}
+
+	public Note() {
+		super();
+	}
+
+	public Note(String id, Long visitNum) {
+		super();
+		this.id = id;
+		this.visitNum = visitNum;
+	}
+	
     
 }

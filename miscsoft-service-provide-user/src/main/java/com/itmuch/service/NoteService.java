@@ -26,6 +26,8 @@ import com.itmuch.model.Note;
 import com.itmuch.model.NoteDetail;
 import com.itmuch.model.Resource;
 import com.itmuch.model.User;
+import com.itmuch.util.JedisUtil;
+import com.itmuch.util.SerialaizerUtils;
 
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.entity.Example.Criteria;
@@ -35,7 +37,8 @@ import tk.mybatis.mapper.entity.Example.Criteria;
 public class NoteService {
 	
 	private static final Logger log = LoggerFactory.getLogger(NoteService.class);
-	
+	@Autowired
+	private JedisUtil jedisUtil;
 	@Autowired
 	private NoteMapper noteMapper;
 	@Autowired
@@ -46,6 +49,9 @@ public class NoteService {
 	private CollectionMapper collectionMapper;
 	@Autowired
 	private Sid sid;
+	
+	public static final String VISITNUM = "note_visit_num_";
+	
 	public String create(Note note, List<NoteDetail> noteDetails, List<MultipartFile> files) {
 		if(StringUtils.isBlank(note.getName())) {
 			throw new BizException("请输入帖子标题");
@@ -102,16 +108,23 @@ public class NoteService {
 	 * @param id
 	 * @return
 	 */
-	public NoteDTO getNoteDetail(NoteDTO query) {
-		NoteDTO result = noteMapper.getNoteDetail(query);
-		/**
-		 * 更新访问量
-		 */
-		Note updatedb = new Note();
-		updatedb.setId(result.getId());
-		updatedb.setVisitNum(result.getVisitNum() + 1);
-		noteMapper.updateByPrimaryKeySelective(updatedb);
-		return result;
+	public NoteDTO getNoteDetail(NoteDTO query,boolean db) {
+		//先从redis中找
+		
+		String key = VISITNUM+query.getId();
+		byte[] value = jedisUtil.get(key.getBytes());
+		if(db ||  value == null) {//如果指定从db中获取or redis中没有
+			NoteDTO result = noteMapper.getNoteDetail(query);
+			result.setVisitNum(result.getVisitNum()+1);
+			jedisUtil.set(key.getBytes(), SerialaizerUtils.serialaizer(result));
+			return result;
+		}else {//如果redis中有数据则返回
+			NoteDTO note = SerialaizerUtils.deserialaize(value);
+			note.setVisitNum(note.getVisitNum()+1);
+			jedisUtil.set(key.getBytes(), SerialaizerUtils.serialaizer(note));
+			return note;
+		}
+		
 	}
 	
 	@Transactional
@@ -120,7 +133,7 @@ public class NoteService {
 			throw new BizException("请先登陆");
 		}
 		/**
-		 * 检查是否已经收藏过
+		 *  检查是否已经收藏过
 		 */
 		Example example = new Example(Collect.class);
 		Criteria criteria = example.createCriteria();

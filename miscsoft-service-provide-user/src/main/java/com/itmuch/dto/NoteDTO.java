@@ -8,6 +8,11 @@ import com.itmuch.model.NoteDetail;
 public class NoteDTO extends Note{
 	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9137450109616800726L;
+
 	private String categrayName;
 	
 	private List<NoteDetail> details;
