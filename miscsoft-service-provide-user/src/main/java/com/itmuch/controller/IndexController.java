@@ -16,15 +16,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itmuch.dto.NoteDTO;
+import com.itmuch.mapper.UserMapper;
 import com.itmuch.model.Categray;
 import com.itmuch.model.Resource;
+import com.itmuch.model.User;
 import com.itmuch.service.CategrayService;
 import com.itmuch.service.FileUploadService;
 import com.itmuch.service.ImageService;
 import com.itmuch.service.NoteService;
+import com.itmuch.service.UserService;
 import com.itmuch.util.JSONResult;
 import com.itmuch.util.WebParamUtils;
 
@@ -46,10 +50,14 @@ public class IndexController extends CoreController{
 	 * @return
 	 */
 	@RequestMapping(value="/")
-	public String view(NoteDTO note, Map<String, Object> map) {
-		Map<String, Object> notes = noteService.list(note, 1);
-		map.put("notes", notes.get("list"));
+	public String view(NoteDTO note,  Map<String, Object> map,@RequestParam(name="page",defaultValue="1") int page) {
+		//根据用户的条件查出对应的结果
+		Map<String, Object> notes = noteService.list(note, page);
+		//查出所有分类
 		Map<String, Object> cate = categrayService.listCategray(new Categray(), false, 0);
+		//开始存放结果
+		map.put("note", note);
+		map.put("notes", notes.get("list"));
 		map.put("categray", cate.get("result"));
 		return "view";
 	}
@@ -65,7 +73,15 @@ public class IndexController extends CoreController{
 		map.put("note", noteDetail);
 		return "noteDetail";
 	}
+	@Autowired
+	private UserService userServicer;
 	
+	@RequestMapping("addAge")
+	@ResponseBody
+	public JSONResult testConcurrent() {
+		User user = userServicer.beforTransation();
+		return JSONResult.ok(user.getAge());
+	}
 	/**
 	 * 随便写一个文件,这个url没有用
 	 * @return

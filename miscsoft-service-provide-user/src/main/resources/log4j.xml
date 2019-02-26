@@ -11,7 +11,7 @@
     </appender>
 
 	<appender name="Daily_File" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="C:/logs/shiroLog.log" />
+		<param name="file" value="logs/shiroLog.log" />
 		<param name="datePattern" value="'.'yyyy-MM-dd" />
 		<param name="append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
@@ -54,7 +54,12 @@
       <!--  <priority value="error" /> -->
         <priority value="debug" />
     </category>
-   
+    
+   <!--指定logger的设置，additivity指示是否遵循缺省的继承机制 -->
+    <logger name="test.log4j.test8.UseLog4j_" additivity="false">
+        <level value ="INFO"/>
+        <appender-ref ref="Daily_File"/>
+    </logger>
     <root>
         <priority value ="error" />
 <!--         <priority value ="debug" /> -->

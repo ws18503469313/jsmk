@@ -11,6 +11,7 @@
     <result column="publish_time" property="publishTime" jdbcType="TIMESTAMP" />
     <result column="shutdown" property="shutdown" jdbcType="BIT" />
     <result column="like" property="like" jdbcType="INTEGER" />
+    <result column="visit_num" property="visitNum" jdbcType="BIGINT" />
   </resultMap>
   <!-- 订单及订单明细的resultMap 使用extends继承，不用再重复用户的映射 -->
 	<resultMap type="com.itmuch.dto.NoteDTO" id="NoteDetailMap" extends="BaseResultMap">
@@ -48,7 +49,7 @@
   	</if>
   </sql>
   <select id="getNoteDetail" parameterType="com.itmuch.dto.NoteDTO" resultMap="NoteDetailMap" >
-  	SELECT nt.id,nt.name,nt.publish_time,nt.like,nt.shutdown,
+  	SELECT nt.id,nt.name,nt.publish_time,nt.like,nt.shutdown,nt.visit_num,
   	ntd.id detail_id,ntd.content detail_content, ntd.sort detail_sort, ntd.type detail_type 
   	from ss_note nt LEFT JOIN ss_note_detail ntd ON nt.id = ntd.note_id 
   	WHERE nt.is_delete = false 

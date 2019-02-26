@@ -35,5 +35,6 @@
 		<!--  <table tableName="ss_note"></table>
 		 <table tableName="ss_note_detail"></table>
 		 <table tableName="ss_categray"></table> -->
+		 <!-- <table tableName="ss_collection"></table> -->
     </context>
 </generatorConfiguration>

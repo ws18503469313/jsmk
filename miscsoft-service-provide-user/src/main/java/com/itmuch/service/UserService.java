@@ -45,4 +45,18 @@ public class UserService {
 		userMapper.insert(user);
 		return "操作成功";
 	}
+	@Transactional
+	public User testConcurrent() {
+		User user = userMapper.selectByPrimaryKey("1");
+		User db = new User();
+		db.setId("1");
+		db.setAge(user.getAge()+1);
+		userMapper.updateByPrimaryKeySelective(db);
+		return user;
+		
+	}
+	
+	public synchronized User  beforTransation() {
+		return testConcurrent();
+	}
 }

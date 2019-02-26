@@ -17,17 +17,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.github.pagehelper.Page;
+import com.itmuch.controller.CoreController;
 import com.itmuch.dto.NoteDTO;
+import com.itmuch.exception.BizException;
 import com.itmuch.model.Note;
 import com.itmuch.model.NoteDetail;
 import com.itmuch.model.Resource;
+import com.itmuch.model.User;
 import com.itmuch.service.FileUploadService;
 import com.itmuch.service.NoteService;
 import com.itmuch.util.JSONResult;
 
 @Controller
 @RequestMapping("/note/")
-public class NoteController {
+public class NoteController extends CoreController{
 	
 	
 	private static final Logger log = LoggerFactory.getLogger(NoteController.class);
@@ -85,6 +88,18 @@ public class NoteController {
 		log.info("------------------------"+msg+"--------------------------------");
 		return JSONResult.ok();
 	}
+	/**
+	 * 收藏帖子
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping("like")
+	@ResponseBody
+	public JSONResult like(String id) {
+		String result = noteService.like(id, getCurrentUser());
+		return JSONResult.ok(result);
+	}
+	
 	
 	@RequestMapping("fileupload")
 	@ResponseBody

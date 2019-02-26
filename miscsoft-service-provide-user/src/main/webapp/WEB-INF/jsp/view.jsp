@@ -31,7 +31,7 @@
 	<div>
 		<label>搜索</label>
 		<div>
-			<input type="text" id="keyword" placeholder="请输入帖子关键字" />
+			<input type="text" id="keyword" value="${note.name }" placeholder="请输入帖子关键字" />
 			<button class="layui-btn"  onclick="search()">查询</button>
 		</div>
 	</div>
@@ -50,7 +50,7 @@
 				<li>
 					<div>
 						<label>名字</label><a>${n.name }</a> <label>发布时间</label><a>${n.publishTime }</a>
-						<label><a onclick="like()"><i class="layui-icon layui-icon-star-fill" style="color: red;font-size: 30px;"></i></a>${n.like }</label>
+						<label><a onclick="like(this)" value="${n.id }"><i class="layui-icon layui-icon-star-fill"  style="color: red;font-size: 30px;"></i></a>${n.like }</label>
 						<a href="${ctx }/index/detail?id=${n.id }" target="_blank">查看详情</a>
 					</div>
 				</li>
@@ -65,6 +65,7 @@
 layui.use('layer', function () {
 	var layer = layui.layer;
 })
+var $ = layui.$;
 function login(obj) {
 	var $ = layui.$;
 //	console.log();
@@ -154,16 +155,24 @@ function registe() {
        	  }
     	});
 }
-function like() {
+function like(o) {
+	var user = '${user}';
+	if(user == ""){
+		layer.alert("请登陆后再操作",{icon:2});
+		return;
+	}
+	var $ = layui.$;
+	var obj = $(o);
+	var id = obj.attr("value");
+	console.log(id);
 	$.ajax({
 	  	url: "/note/like",
         type: "POST",
-        data: {'username':username, 'password':password,'name':name},
+        data: {'id': id},
         dateType:"json",
         success: function (result) {
-        	console.log(result+"-----------------------------------");
+//        	console.log(result+"-----------------------------------");
         	if(result.status == 200){
-        		layer.close(index);
             	layer.alert(result.msg, {icon: 1});
         	}else{
         		layer.alert(result.msg, {icon: 2});
@@ -172,11 +181,21 @@ function like() {
         	
         },
         error: function (result) {
-        	console.log(result+"-----------------------------------");
+//        	console.log(result+"-----------------------------------");
 		}
     
 	});
 	
+}
+
+function search() {
+	
+	var keyword = $('#keyword').val();
+	if(keyword == "" || keyword.lenth == 0){
+		return;
+	}
+	console.log(keyword);
+	window.location.href='${ctx}/index/?name='+keyword;
 }
 </script>
 </html>

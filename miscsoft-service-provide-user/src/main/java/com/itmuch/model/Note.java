@@ -38,7 +38,10 @@ public class Note {
      * 被喜欢次数
      */
     private Integer like;
-    
+    /**
+     * 访问量
+     */
+    private Long visitNum;
     /**
      * 是否被删除
      */
@@ -139,6 +142,14 @@ public class Note {
 
 	public void setIsDelete(Boolean isDelete) {
 		this.isDelete = isDelete;
+	}
+
+	public Long getVisitNum() {
+		return visitNum;
+	}
+
+	public void setVisitNum(Long visitNum) {
+		this.visitNum = visitNum;
 	}
     
 }
