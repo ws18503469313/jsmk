@@ -22,9 +22,15 @@
 	<div>
 		<h2>noteDetail</h2>
 		<div>
-			<h1>${note.name }</h1>
-			<label>发布时间</label><a>${note.publishTime }</a>
-
+			<div>
+				<h1>${note.name }</h1>
+			</div>
+			<div>
+				<label>发布时间</label><a>${note.publishTime }</a>
+			</div>
+			<div>
+				<label>访问量</label><a>${note.visitNum }</a>
+			</div>
 		</div>
 		<div>
 			<c:forEach items="${note.details }" var="i">
@@ -37,9 +43,8 @@
 							<img alt="图片" src="${i.content }">
 						</c:when>
 						<c:when test="${i.type eq 2 }">
-							<video id="video" controls preload="auto" > 
-								<source src="/video/8b40143e3d3c594dd7c01eeef42082df.mp4">
-							</video>
+							<video id="video" controls preload="auto"> <source
+								src="/video/8b40143e3d3c594dd7c01eeef42082df.mp4"></video>
 						</c:when>
 					</c:choose>
 				</div>

@@ -1,23 +1,22 @@
-package com.itmuch.service;
+package com.itmuch.concurrent;
 
 import java.util.Iterator;
 import java.util.Set;
 
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.Rollback;
 
 import com.google.gson.Gson;
+import com.itmuch.BaseTests;
 import com.itmuch.dto.NoteDTO;
 import com.itmuch.mapper.NoteMapper;
 import com.itmuch.model.Note;
+import com.itmuch.service.NoteService;
 import com.itmuch.util.JedisUtil;
-import com.itmuch.util.SerialaizerUtils;
 
-@Component
-public class ScheduledService {
-	
+public class TestSaveVistNum extends BaseTests{
+
 	
 	@Autowired
 	private JedisUtil jedisUtil;
@@ -25,11 +24,8 @@ public class ScheduledService {
 	private NoteMapper noteMapper;
 	@Autowired
 	private NoteService noteService;
-	/**
-	 * 每10分钟保存redis数据到数据库一次
-	 */
-	@Scheduled(cron = "0 0/10 * * * ? ")
-	@Transactional
+	@Test
+	@Rollback(true)
 	public void saveVisitNum() {
 		Set<byte[]> cache = jedisUtil.keys(NoteService.VISITNUM+"*");
 		Iterator<byte[]> it = cache.iterator();
@@ -37,7 +33,7 @@ public class ScheduledService {
 		while (it.hasNext()) {
 			byte[] key = (byte[]) it.next();
 			byte[] value = jedisUtil.get(key);
-			NoteDTO dto = gson.fromJson(new String(value), NoteDTO.class);//这个是从redis中获取反序列化出来的数据
+			NoteDTO dto = gson.fromJson(value.toString(), NoteDTO.class);//这个是从redis中获取反序列化出来的数据
 			NoteDTO db = noteService.getNoteDetail(dto, true);//这个是从mysql中查出来的原始数据
 			if(dto.getVisitNum() != db.getVisitNum()) {
 				Note temp = new Note(dto.getId(), dto.getVisitNum());//这个是要更新数据库中的visitNum的

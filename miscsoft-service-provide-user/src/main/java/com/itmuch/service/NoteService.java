@@ -16,6 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.itmuch.dto.NoteDTO;
 import com.itmuch.exception.BizException;
 import com.itmuch.mapper.CollectionMapper;
@@ -106,22 +109,25 @@ public class NoteService {
 	/**
 	 * 根据条件查询
 	 * @param id
+	 * @param db 是否从mysql中获取
 	 * @return
 	 */
-	public NoteDTO getNoteDetail(NoteDTO query,boolean db) {
+	public synchronized NoteDTO getNoteDetail(NoteDTO query,boolean db) {
 		//先从redis中找
-		
 		String key = VISITNUM+query.getId();
+		Gson gson = new Gson();
 		byte[] value = jedisUtil.get(key.getBytes());
 		if(db ||  value == null) {//如果指定从db中获取or redis中没有
 			NoteDTO result = noteMapper.getNoteDetail(query);
-			result.setVisitNum(result.getVisitNum()+1);
-			jedisUtil.set(key.getBytes(), SerialaizerUtils.serialaizer(result));
+			if(db) {
+				result.setVisitNum(result.getVisitNum()+1);
+			}
+			jedisUtil.set(key.getBytes(), gson.toJson(result).getBytes());
 			return result;
 		}else {//如果redis中有数据则返回
-			NoteDTO note = SerialaizerUtils.deserialaize(value);
+			NoteDTO note = gson.fromJson(new String(value), NoteDTO.class);
 			note.setVisitNum(note.getVisitNum()+1);
-			jedisUtil.set(key.getBytes(), SerialaizerUtils.serialaizer(note));
+			jedisUtil.set(key.getBytes(), gson.toJson(note).getBytes());
 			return note;
 		}
 		

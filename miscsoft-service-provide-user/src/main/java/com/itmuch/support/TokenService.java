@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {
-	private static Set<String> set = new HashSet();
+	private static Set<String> set = new HashSet<String>();
 	private static Lock lock = new ReentrantLock();
 	private static int CACHE_SIZE = 100;
 
