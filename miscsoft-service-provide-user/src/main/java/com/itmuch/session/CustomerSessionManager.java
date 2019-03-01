@@ -30,11 +30,14 @@ public class CustomerSessionManager extends DefaultWebSessionManager{
 		if(request != null && sessionId != null){
 			Session session = (Session)request.getAttribute(sessionId.toString());
 			if(session != null) {
+				log.info("--------------------------------get_session_from_request------------------------");
 				return session;
 			}
 		}
 		//request中没有session才到redis中获取session,并直接保存到request中
+		
 		Session session = 	super.retrieveSession(sessionKey);
+		log.info("--------------------------------get_session_from_redis_and_save_to_request------------------------");
 		if(request != null && sessionId != null) {
 			request.setAttribute(sessionId.toString(),session);
 		}

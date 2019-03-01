@@ -15,7 +15,7 @@
   </resultMap>
   
   <select id="getRole"  parameterType="java.lang.String" resultType="com.itmuch.dto.UserRoleDTO">
-  		SELECT su.id UID, su.username username, role.id RoleID, role.rolename Rolename 
+  		SELECT su.id UID, su.username username, role.id roleID, role.rolename rolename 
 		from sys_user su 
 		LEFT JOIN sys_user_role sur on su.id = sur.user_id 
 		LEFT JOIN sys_role role on role.id = sur.role_id
@@ -25,4 +25,31 @@
   <select id="getUserByUsername" parameterType="java.lang.String" resultType="com.itmuch.model.User">
   		SELECT * from sys_user where username = #{username}
   </select>
+  
+  <update id="saveUserRole" parameterType="com.itmuch.dto.UserRoleDTO">
+  		UPDATE sys_user_role SET role_id = #{newRoleID} WHERE user_id = #{UID}
+  </update>
+  
+  <insert id="creatUserRole" parameterType="com.itmuch.dto.UserRoleDTO">
+		INSERT INTO sys_user_role	(user_id ,role_id) VALUES (#{UID}, #{newRoleID})
+  </insert>
+  
+  <select id="listUser" parameterType="com.itmuch.model.User" resultType="com.itmuch.dto.UserDTO">
+  		SELECT su.id id, su.age age, su.birthday birthday, su.descript descprit, su.`name` `name`, su.username username, sr.rolename rolename
+  		FROM sys_user su LEFT JOIN sys_user_role sur ON su.id = sur.user_id LEFT JOIN sys_role sr ON sur.role_id = sr.id
+		WHERE 1=1
+		<include refid="common" />
+  </select>
+  
+  <sql id="common">
+  	<if test="id!=null and id!=''">
+  		AND su.id = #{id}
+  	</if>
+  	<if test="name != null and name != ''">
+  		AND su.name like "%"#{name}"%"
+  	</if>
+  	<if test="username != null and username != ''">
+  		OR su.username like "%"#{username}"%"
+  	</if>
+  </sql>
 </mapper>

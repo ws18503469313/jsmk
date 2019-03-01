@@ -31,7 +31,7 @@ public class RedisCache<K,V> implements Cache<K, V>{
 	private JedisUtil jedisUtil;
 	
 	public V get(K key) throws CacheException {
-		log.info("-------------------------------------从redis中获取session数据---------------------------------------");
+		log.info("-------------------------------------从redis中获取数据---------------------------------------");
 		byte[] value = jedisUtil.get(getKey(key));
 		if(value != null) {
 			return (V)SerializationUtils.deserialize(value);

@@ -198,13 +198,14 @@ a:hover {
 		  		            dateType:"json",
 		  		          	async: false, 
 		  		            success: function (data) {
-		  		            	layer.alert(data.msg, {icon: 1});
-		  		            	id = data.data.id;
-		  		            },
-		  		            error: function (data) {
-		  		            	layer.alert(data.msg, {icon: 2});
-		  		            	return false;
-							}
+		  		            	if(data.status == 200){
+		  		            		layer.alert(data.msg, {icon: 1});
+			  		            	id = data.data.id;
+		  		            	}else{
+		  		            		layer.alert(data.msg, {icon: 6});
+			  		            	return false;
+		  		            	}
+		  		            }
 		  	            
 		  	           });
 //	                   console.log(id+"--------------系统回传id");
@@ -320,13 +321,14 @@ a:hover {
 		  		            data: {'name':accessName},
 		  		            dateType:"json",
 		  		            success: function (data) {
-		  		            	layer.alert(data.msg, {icon: 1});
-		  		            	id = data.data;
-		  		            },
-		  		            error: function (data) {
-		  		            	layer.alert(data.msg, {icon: 2});
-		  		            	return false;
-							}
+		  		            	if(data.status == 200){
+		  		            		layer.alert(data.msg, {icon: 1});
+			  		            	id = data.data.id;
+		  		            	}else{
+		  		            		layer.alert(data.msg, {icon: 6});
+			  		            	return false;
+		  		            	}
+		  		            }
 		  	            
 		  	       });
 		           layer.load(2);  

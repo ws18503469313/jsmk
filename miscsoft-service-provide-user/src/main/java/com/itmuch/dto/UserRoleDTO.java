@@ -2,13 +2,20 @@ package com.itmuch.dto;
 
 public class UserRoleDTO {
 	
+	
 	private String username;
 	
-	private String Rolename;
+	private String rolename;
 	
 	private String UID;
-	
-	private String RoleID;
+	/**
+	 * 用户原有的角色ID
+	 */
+	private String roleID;
+	/**
+	 * 用户新分配的角色ID
+	 */
+	private String newRoleID;
 
 	public String getUsername() {
 		return username;
@@ -19,11 +26,11 @@ public class UserRoleDTO {
 	}
 
 	public String getRolename() {
-		return Rolename;
+		return rolename;
 	}
 
 	public void setRolename(String rolename) {
-		Rolename = rolename;
+		this.rolename = rolename;
 	}
 
 	public String getUID() {
@@ -35,12 +42,26 @@ public class UserRoleDTO {
 	}
 
 	public String getRoleID() {
-		return RoleID;
+		return roleID;
 	}
 
 	public void setRoleID(String roleID) {
-		RoleID = roleID;
+		this.roleID = roleID;
 	}
+
+	public String getNewRoleID() {
+		return newRoleID;
+	}
+
+	public void setNewRoleID(String newRoleID) {
+		this.newRoleID = newRoleID;
+	}
+
+	
+
+	
+
+	
 
 	
 	

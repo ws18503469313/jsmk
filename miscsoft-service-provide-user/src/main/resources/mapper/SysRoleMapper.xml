@@ -43,4 +43,5 @@
   <insert id="saveRoleAccess" parameterType="com.itmuch.dto.RoleAccessDTO">
   		INSERT INTO sys_role_access (id, role_id, access_id) VALUES (#{id},#{roleId},#{accessId})
   </insert>
+  
 </mapper>

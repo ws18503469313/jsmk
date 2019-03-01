@@ -1,5 +1,7 @@
 package com.itmuch.service;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,4 +58,11 @@ public class RoleService {
 		return "success";
 	}
 	
+	/**
+	 *    系统中获取所有role
+	 * @return
+	 */
+	public List<Role> listAllRole(){
+		return roleMapper.selectAll();
+	}
 }

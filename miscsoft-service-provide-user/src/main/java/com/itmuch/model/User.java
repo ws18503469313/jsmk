@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Table(name = "sys_user")
 public class User implements Serializable{
     /**
@@ -23,7 +27,7 @@ public class User implements Serializable{
     private String password;
     
     private Double balance;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date birthday;
 
     private String descript;

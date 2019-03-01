@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,24 @@ public class AccessService {
 				throw new BizException("请输入标题 ");
 			}
 			if(!trans.getParent().equals("#")) {//如果是创建二级菜单则要获取parent 的 id
+				Example condition = new Example(Access.class);
+				Example.Criteria existCondition = condition.createCriteria();
+				String url = trans.getUrl().trim();
+				//对url进行规范化处理
+				if(url.charAt(0) == '/') { 
+					url = url.substring(1);
+				}
+				existCondition.andEqualTo("url", url);
+				List<Access> exist = accessMapper.selectByExample(condition);
+				if(CollectionUtils.isNotEmpty(exist)) {
+					throw new BizException("该url已存在");
+				}
 				Example example = new Example(Access.class);
 				Example.Criteria criteria = example.createCriteria();
 				criteria.andEqualTo("title", trans.getParent());
 				List<Access> accesses = accessMapper.selectByExample(example);
 				trans.setParent(accesses.get(0).getId());
+				trans.setUrl(url);
 			}
 			trans.setId(sid.nextShort());
 			trans.setCreatedTime(new Date());

@@ -51,7 +51,7 @@ public class AccessController extends CoreController{
 	@RequiresRoles(value= {"admin", "manager"},logical = Logical.OR)
 	@ResponseBody
 	public JSONResult delete(String name) {
-		log.debug("---------------------------------"+name+"---------------------------");
+//		log.debug("---------------------------------"+name+"---------------------------");
 		return JSONResult.ok(accessService.deleteAccess(name));
 	}
 	/**

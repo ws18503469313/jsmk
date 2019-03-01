@@ -1,31 +1,33 @@
 package com.itmuch.controller;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.itmuch.dto.UserDTO;
 import com.itmuch.dto.UserRoleDTO;
 import com.itmuch.mapper.UserMapper;
 import com.itmuch.model.Resource;
+import com.itmuch.model.Role;
 import com.itmuch.model.User;
+import com.itmuch.service.RoleService;
 import com.itmuch.service.UserService;
 import com.itmuch.util.JSONResult;
 
 import tk.mybatis.mapper.entity.Example;
 
 
-@RestController
+@Controller
+@RequestMapping(value="/user")
 public class UserController {
 	
 	
@@ -39,13 +41,16 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private Sid sid;
+	@Autowired
+	private RoleService	roleService;
 	
 //	@RequestMapping("/{id}")
 //	public User findById(@PathVariable String id) {
 //		return userMapper.selectByPrimaryKey("1");
 //		
 //	}
-	@RequestMapping("/findByIdJSON")
+	@RequestMapping("/findById")
+	@ResponseBody
 	public JSONResult findByIdJSON(String id) {
 		
 		User user = userMapper.selectByPrimaryKey(id);
@@ -54,6 +59,7 @@ public class UserController {
 	}
 	
 	@RequestMapping("/getResource")
+	@ResponseBody
 	public JSONResult getResource() {
 		
 		
@@ -68,6 +74,7 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping("/addUser")
+	@ResponseBody
 	public JSONResult addUser(User user) {
 		
 //		User user = JSON.parseObject(json, User.class);
@@ -75,32 +82,54 @@ public class UserController {
 
 	}
 	
-	@RequestMapping("/getUser")
-	public JSONResult getUser() {
-		User user = userMapper.selectByPrimaryKey("1");
-		return JSONResult.ok(user);
-
-	}
 	
-	
+	/**
+	 * 
+	 *   分页获取用户
+	 * @param page
+	 * @param user
+	 * @return
+	 */
 	@RequestMapping("/pageUser")
+	@ResponseBody
 	public JSONResult pageUser(@RequestParam(name="page",defaultValue="0") int page,User user) {
-		System.out.println(resource.getPagesize()+"<"+page);
+//		System.out.println(resource.getPagesize()+"<"+page);
 		PageHelper.startPage(page,resource.getPagesize());
-		Example example = new Example(User.class);
-		Example.Criteria criteria = example.createCriteria();
-		if(!StringUtils.isEmpty(user.getUsername())) {
-			criteria.andLike("username", "%"+user.getUsername()+"%");
-		}
-		List<User> users = userMapper.selectByExample(example);
+//		Example example = new Example(User.class);
+//		Example.Criteria criteria = example.createCriteria();
+//		criteria.
+//		if(!StringUtils.isEmpty(user.getUsername())) {
+//			criteria.andLike("username", "%"+user.getUsername()+"%");
+//			criteria.orLike("name", "%"+user.getName()+"%");
+//		}
+//		List<User> users = userMapper.selectByExample(example);
+		List<UserDTO> users = userMapper.listUser(user);
 		return JSONResult.ok(users);
 
 	}
-	
-	@RequestMapping("/getRole")
-	public JSONResult getRole(String id) {
-		List<UserRoleDTO> roles = userMapper.getRole(id);
-		return JSONResult.ok(roles);
+	/**
+	 * 获取某用户的角色
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping("/userRoleManager")
+	public String getRole(String id, Map<String, Object> map) {
+		UserRoleDTO userRole = userMapper.getRole(id);
+		List<Role> roles = roleService.listAllRole();
+		map.put("userRole", userRole);
+		map.put("roles", roles);
+		return "sys/userRoleManager";
+	}
+	/**
+	 *  保存用户角色信息
+	 * @param dto
+	 * @return
+	 */
+	@RequestMapping("/setRole")
+	@ResponseBody
+	public JSONResult setRole(UserRoleDTO dto) {
+		String msg = userService.saveUserRole(dto);
+		return JSONResult.ok(msg);
 	}
 	
 	

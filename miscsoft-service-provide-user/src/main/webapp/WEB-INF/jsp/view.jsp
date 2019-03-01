@@ -65,7 +65,6 @@
 layui.use('layer', function () {
 	var layer = layui.layer;
 })
-var $ = layui.$;
 function login(obj) {
 	var $ = layui.$;
 //	console.log();
