@@ -3,6 +3,8 @@ package com.itmuch.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +77,7 @@ public class UserController {
 	 */
 	@RequestMapping("/addUser")
 	@ResponseBody
+	@RequiresPermissions(value= {"user.add"})
 	public JSONResult addUser(User user) {
 		
 //		User user = JSON.parseObject(json, User.class);

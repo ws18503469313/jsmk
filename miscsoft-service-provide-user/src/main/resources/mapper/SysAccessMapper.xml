@@ -35,4 +35,5 @@
 	<delete id="deleteAccessByParentId" parameterType="java.lang.String">
 		DELETE FROM sys_access WHERE parent = #{id}
 	</delete>
+	
 </mapper>

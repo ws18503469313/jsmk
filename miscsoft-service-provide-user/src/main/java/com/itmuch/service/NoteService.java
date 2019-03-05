@@ -119,9 +119,6 @@ public class NoteService {
 		byte[] value = jedisUtil.get(key.getBytes());
 		if(db ||  value == null) {//如果指定从db中获取or redis中没有
 			NoteDTO result = noteMapper.getNoteDetail(query);
-			if(db) {
-				result.setVisitNum(result.getVisitNum()+1);
-			}
 			jedisUtil.set(key.getBytes(), gson.toJson(result).getBytes());
 			return result;
 		}else {//如果redis中有数据则返回

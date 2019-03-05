@@ -3,6 +3,7 @@ package com.itmuch.controller.busyness;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -71,6 +72,7 @@ public class CategrayController {
 	}
 	@RequestMapping("delete")
 	@ResponseBody
+	@RequiresPermissions(value = {"categray.delete"})
 	public JSONResult delete(String id) {
 		
 		categrayMapper.deleteByPrimaryKey(id);
