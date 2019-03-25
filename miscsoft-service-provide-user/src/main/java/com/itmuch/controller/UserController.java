@@ -3,13 +3,12 @@ package com.itmuch.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,8 +23,6 @@ import com.itmuch.model.User;
 import com.itmuch.service.RoleService;
 import com.itmuch.service.UserService;
 import com.itmuch.util.JSONResult;
-
-import tk.mybatis.mapper.entity.Example;
 
 
 @Controller
@@ -46,11 +43,11 @@ public class UserController {
 	@Autowired
 	private RoleService	roleService;
 	
-//	@RequestMapping("/{id}")
-//	public User findById(@PathVariable String id) {
-//		return userMapper.selectByPrimaryKey("1");
-//		
-//	}
+	@RequestMapping("/test/{id}")
+	public User findById(@PathVariable String id) {
+		return userMapper.selectByPrimaryKey("1");
+		
+	}
 	@RequestMapping("/findById")
 	@ResponseBody
 	public JSONResult findByIdJSON(String id) {

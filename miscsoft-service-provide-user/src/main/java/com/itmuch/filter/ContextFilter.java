@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * 
  * 
  * Aug 31, 2012
- *
+ *	将ctx放入session
  */
 public class ContextFilter implements Filter {
 	private static Logger logger = LoggerFactory.getLogger(ContextFilter.class);

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itmuch.mapper.AuthorityMapper" >
+  <resultMap id="BaseResultMap" type="com.itmuch.model.Authority" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="CHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="module" property="module" jdbcType="VARCHAR" />
+    <result column="seq" property="seq" jdbcType="INTEGER" />
+    <result column="access_id" property="accessId" jdbcType="CHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <select id="selectAuthorityByRole" parameterType="java.lang.String" resultType="java.lang.String">
+  		SELECT
+			sa.`code`
+		FROM
+			sys_authority sa
+		LEFT JOIN sys_role_authority sra ON sa.id = sra.authority_id
+		LEFT JOIN sys_role sr ON sr.id = sra.role_id
+		where sr.rolename = #{role}
+  </select>
+</mapper>

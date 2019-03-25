@@ -1,6 +1,7 @@
 package com.itmuch.Configuration;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.google.common.collect.Maps;
 import com.itmuch.cache.RedisCacheManager;
 import com.itmuch.shiro.CredentialsMatcher;
 import com.itmuch.shiro.UserRealm;
@@ -36,8 +38,7 @@ public class ShiroConfiguration {
         bean.setLoginUrl("/index/");
         bean.setSuccessUrl("/main/index");
         //配置访问权限
-        LinkedHashMap<String, String> filterChainDefinitionMap=new LinkedHashMap<>();
-        
+        LinkedHashMap<String, String> filterChainDefinitionMap = Maps.newLinkedHashMap();
         //静态资源
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/css/**", "anon");
@@ -48,7 +49,10 @@ public class ShiroConfiguration {
         filterChainDefinitionMap.put("/html/*.html", "anon");
         filterChainDefinitionMap.put("/index/*", "anon"); 
         filterChainDefinitionMap.put("/addUser", "anon"); 
-         
+        
+        //WX
+        filterChainDefinitionMap.put("/wx/*", "anon"); 
+        
         //登陆
         filterChainDefinitionMap.put("/main/doLogin", "anon"); 
         filterChainDefinitionMap.put("/main/ajaxLogin", "anon");

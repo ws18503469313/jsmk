@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="MysqlContext" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+            <property name="mappers" value="com.itmuch.util.MyMapper"/>
+        </plugin>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/jshm?useSSL=false"
+                        userId="root"
+                        password="root">
+        </jdbcConnection>
+
+        <!-- 对于生成的pojo所在包 -->
+        <javaModelGenerator targetPackage="com.itmuch.model" targetProject="src/main/java"/>
+
+		<!-- 对于生成的mapper所在目录 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"/>
+
+		<!-- 配置mapper对应的java映射 -->
+        <javaClientGenerator targetPackage="com.itmuch.mapper" targetProject="src/main/java"
+                             type="XMLMAPPER"/>
+
+
+		<!-- <table tableName="sys_user"></table>
+		<table tableName="sys_role"></table>
+		<table tableName="sys_access"></table> -->
+		<!--  <table tableName="ss_note"></table>
+		 <table tableName="ss_note_detail"></table>
+		 <table tableName="ss_categray"></table> -->
+		 <!-- <table tableName="ss_collection"></table> -->
+		<!--  <table tableName="sys_authority"></table> -->
+    </context>
+</generatorConfiguration>

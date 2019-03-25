@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itmuch.mapper.AccessMapper">
+	<resultMap id="BaseResultMap" type="com.itmuch.model.Access">
+		<!-- WARNING - @mbg.generated -->
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="url" jdbcType="VARCHAR" property="url" />
+		<result column="title" jdbcType="VARCHAR" property="title" />
+		<result column="created_time" jdbcType="VARCHAR"
+			property="createdTime" />
+	</resultMap>
+
+	<select id="getAccessByRole" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		SELECT sa.url from sys_role sr
+		LEFT JOIN sys_role_access sra
+		on sr.id = sra.role_id
+		LEFT JOIN sys_access sa on sra.access_id = sa.id
+		WHERE sr.rolename = #{ro}
+	</select>
+
+	<select id="getSysAccessTree" parameterType="java.lang.String"
+		resultType="com.itmuch.model.Access" >
+		SELECT sa.id,sa.title,sa.url,sa.parent
+		FROM sys_access sa
+		LEFT JOIN sys_role_access sra ON sa.id = sra.access_id
+		WHERE sra.role_id = #{roleId}
+	</select>
+	<select id="selectAccessChildren" parameterType="java.lang.String" resultType="com.itmuch.model.Access">
+		SELECT id FROM sys_access where parent = #{id}
+	</select>
+	<delete id="deleteRoleAccessByAccessId" parameterType="java.lang.String">
+		DELETE FROM sys_role_access WHERE access_id =#{id}
+	</delete>
+	<delete id="deleteAccessByParentId" parameterType="java.lang.String">
+		DELETE FROM sys_access WHERE parent = #{id}
+	</delete>
+	
+</mapper>

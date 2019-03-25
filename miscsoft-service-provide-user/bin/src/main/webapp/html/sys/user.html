@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+	<link href="/lay/css/modules/laydate/default/laydate.css">
+    <link href="/lay/css/modules/layer/default/layer.css">
+    <link href="/lay/css/modules/code.css">
+    <link rel="stylesheet" href="/lay/css/layui.css">
+    
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/lay/layui.all.js"></script>
+    <script type="text/javascript" src="/lay/layui.js"></script>
+    <style type="text/css">
+    	.layui-btn{
+		    top: 50%;
+		    transform: translateY(-5%);
+		}
+    </style>
+
+</head>
+<body>
+	<div><h1>分类管理</h1></div>
+ 	<div class="demoTable">
+	    搜索：
+	    <div class="layui-inline">
+	        <input class="layui-input" name="keyword" id="demoReload" autocomplete="off">
+	    </div>
+	    <button class="layui-btn" data-type="reload">搜索</button>
+	    <button class="layui-btn"  onclick="create()">新增</button>
+	    <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
+	  	<button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
+	  	<button class="layui-btn" data-type="isAll">验证是否全选</button>
+	</div>
+	<!-- 表格主体 -->
+ 	<table class="layui-hide" id="user" lay-filter="filter"></table>
+<!--  lay-ui js操作开始 -->	
+<!-- 加上操作栏 --> 	
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-mini" lay-event="auth">分配角色</a>
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+
+
+<script type="text/javascript">
+	layui.use('table', function(){
+	  var table = layui.table;
+	  
+	  table.render({
+	    elem: '#user'
+	    ,id:'idForTable'
+	    ,url:'/user/pageUser'
+	    ,cols: [[
+	      {type:'checkbox'}
+	      ,{field:'id', width:200, title: 'ID'}
+	      ,{field:'name', width:150, title: '账号'}
+	      ,{field:'username', width:80, title: '昵称'}
+	      ,{field:'rolename', width:100, title: '角色'}
+	      ,{field:'age',width:100,title:'年龄',sort:true}
+	      ,{field:'birthday', width:200, title: '生日'}
+	      ,{field:'descript', width:100, title: '描述'}
+	      ,{field:'right', title: '操作', toolbar:"#barDemo"}
+	    ]]
+	    ,page: {
+	        layout: [  'prev', 'page', 'next', 'skip','count'] //自定义分页布局
+	    }
+	    ,response: {
+		   statusName: 'status' //数据状态的字段名称，默认：code
+		   ,statusCode: 200 //成功的状态码，默认：0
+		   ,countName: 'total' //规定数据总数的字段名称，默认：count
+		   ,msgName: 'msg' //状态信息的字段名称，默认：msg
+		   ,dataName: 'data' //数据列表的字段名称，默认：data
+	    }
+	  });
+	  
+	  	var $ = layui.$, active = {
+	  			getCheckData: function(){ //获取选中数据
+	  		      var checkStatus = table.checkStatus('idForTable')
+	  		      ,data = checkStatus.data;
+	  		      layer.alert(JSON.stringify(data));
+	  		    }
+	  		    ,getCheckLength: function(){ //获取选中数目
+	  		      var checkStatus = table.checkStatus('idForTable')
+	  		      ,data = checkStatus.data;
+	  		      layer.msg('选中了：'+ data.length + ' 个');
+	  		    }
+	  		    ,isAll: function(){ //验证是否全选
+	  		      var checkStatus = table.checkStatus('idForTable');
+	  		      layer.msg(checkStatus.isAll ? '全选': '未全选')
+	  		    }
+	  		  	,reload: function(){
+					 console.log(123);
+				     var demoReload = $('#demoReload');
+		
+				     table.reload('idForTable', {
+				         where: {
+				             name: demoReload.val(),
+				             username:demoReload.val()
+				         }
+				     });
+				 }
+	   };
+	  	
+	  	$('.demoTable .layui-btn').on('click', function(){
+		    var type = $(this).data('type');
+		    active[type] ? active[type].call(this) : '';
+		});
+	  	
+	  //监听表格复选框选择
+        table.on('checkbox(filter)', function(obj){
+            console.log(obj);
+            
+        });
+        
+      //监听工具条
+        table.on('tool(filter)', function(obj){
+        	console.log(obj);
+            var data = obj.data;
+            if(obj.event === 'auth'){
+            	layer.open({
+	  	        	type: 2,
+	  	        	area: ['400px', '600px'],
+	  	        	fixed: false, //不固定
+	  	       	 	btn: ['提交', '关闭'],
+	  	        	maxmin: true,
+	  	        	content: '/user/userRoleManager?id='+data.id,
+	  	        	title: '角色管理',
+	  	        	btn1:function(index,layero){
+	  	        		var detailForm = layer.getChildFrame('form', index);
+//	  	        		console.log(detailForm.serialize());
+	  	        		$.ajax({
+	  	                    type:"post",
+	  	                    url:"/user/setRole",
+	  	                    data: detailForm.serialize(),//表单数据
+	  	                    success:function(data){
+	  	                        if(status == 200){
+	  	                        	layer.msg(data.data, {icon: 6});//保存成功提示
+	  	                        }else{
+	  	                        	layer.msg(data.msg, {icon: 2});
+	  	                        }
+	  	                        
+	  	                        layer.closeAll('iframe');//关闭弹窗
+	  	                    }
+	  	                });
+	  	        	},
+	  	        	btn2:function(index, layero){
+	  	        		 layer.closeAll('iframe');//关闭弹窗
+	  	        	}
+  	        	});
+//                layer.alert('ID：'+ data.id + ' 的查看操作');
+			
+            } else if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    console.log(data);
+                    $.ajax({
+                        url: "/user/delete",
+                        type: "POST",
+                        data:{"id":data.id},//"id":data.id,"memthodname":"deleteuv","aid":data.aid
+                        dataType: "json",
+                        success: function(data){
+
+                            if(data.status==200){
+                                obj.del();
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            }else{
+                                layer.msg("删除失败", {icon: 5});
+                            }
+                        }
+
+                    });
+                });
+            } else if(obj.event === 'edit'){
+
+                layer.prompt({
+                    formType: 2
+                    ,title: '修改 ID 为 ['+ data.id +'] 的名称'
+                    ,value: data.name
+                }, function(value, index){
+                    EidtUv(data,value,index,obj);
+                   
+
+
+                });
+
+
+
+            }
+        });
+	});
+		
+	function  EidtUv(data,value,index,obj) {
+		var categray = {"id":data.id, "name":value, "createTime":data.createTime};
+	    $.ajax({
+	        url: "/categray/update",
+	        type: "POST",
+	        contentType: "application/json;charset=UTF-8",
+	        data:  JSON.stringify(categray),
+	        dataType: "json",
+	        success: function(data){
+				console.log(data);
+	            if(data.status==200){
+	               //关闭弹框
+	                layer.close(index);
+	                //同步更新表格和缓存对应的值
+	                obj.update({
+	                    name: value
+	                });
+	                layer.msg("修改成功", {icon: 6});
+	            }else{
+	                layer.msg("修改失败", {icon: 5});
+	            }
+	        }
+
+	    });
+	}	
+	
+</script>
+
+<script type="text/javascript">
+	/**
+	 * 添加操作
+	 * title : 弹窗名称
+	 * formType: 1-- 口令 2--文本框  3-- 输入框
+	 * text: 用户输入的内容
+	 * index: 窗体本身
+	 */
+	function create() {
+		layer.prompt({title: '输入分类，并确认', formType: 2}, function(text, index){
+		    layer.close(index);
+		    layer.msg('演示完毕！您的口令：'+ text );
+		    $.ajax({
+	            type: "POST",
+	            url: "/categray/save",
+	            data: {'name':text},
+	            dateType:"json",
+	            
+	            success: function (data) {
+	            	console.log(data);
+	            	if(data.data == 'ok'){
+	            		/* layer.alert(data.data, {icon: 1}); */
+	            		location.reload();
+	            	}else{
+	            		layer.alert(data.data, {icon: 2});
+	            	}
+	            }
+	            
+	        });
+		});
+	}	
+</script>
+</body>
+</html>
