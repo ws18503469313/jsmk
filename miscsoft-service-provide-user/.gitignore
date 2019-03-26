@@ -10,7 +10,6 @@
 .springBeans
 .sts4-cache
 ###java###
-*.yml
 *.class
 /.apt_generated/
 /.apt_generated_tests/
