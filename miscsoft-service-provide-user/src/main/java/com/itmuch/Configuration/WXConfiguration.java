@@ -12,4 +12,6 @@ public class WXConfiguration {
 	private String secret;
 	@Value("${wx.appid}")
 	private String appid;
+	
+	
 }
