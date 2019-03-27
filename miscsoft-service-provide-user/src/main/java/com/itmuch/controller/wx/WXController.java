@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,14 +63,34 @@ public class WXController extends BaseController{
 	 * @param resp
 	 * @throws IOException
 	 */
-	@RequestMapping("/checkSignature")
-	public void checkSignature(String signature, String timestamp, String nonce, String echostr,HttpServletResponse resp) throws IOException {
+	@RequestMapping(value = "/checkSignature",  method = RequestMethod.GET)
+	public void checkSignature(String signature, String timestamp, String nonce, String echostr, HttpServletRequest req,HttpServletResponse resp) throws IOException {
 		PrintWriter writer = resp.getWriter();
 		if (CheckUtils.checkSignature(signature, timestamp, nonce)) {
 			writer.write(echostr);
 		}
 	}
 	
+	@RequestMapping(value = "/checkSignature",  method = RequestMethod.POST)
+	public void busyness(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		// 1.判断推动的数据类型
+
+		log.debug("==================eventpush:POST========================");
+
+		PrintWriter out = resp.getWriter();
+
+		if (CheckUtils.checkSignature(req)) {
+
+		String message = eventPushService.DoEvent(request);
+
+		out.write(message);
+
+		} else {
+
+		out.write("error");
+
+		}
+	}
 	/**
 	 * 微信小程序登陆方法
 	 * @param code
