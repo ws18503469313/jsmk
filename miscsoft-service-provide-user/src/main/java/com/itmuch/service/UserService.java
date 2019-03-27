@@ -17,6 +17,7 @@ import com.itmuch.mapper.UserMapper;
 import com.itmuch.model.User;
 
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 public class UserService {
@@ -86,5 +87,13 @@ public class UserService {
 			return "保存成功";
 		}
 
+	}
+	
+	public User loadByUserName(String username) {
+//		Example example = new Example(User.class);
+//		Criteria criteria = example.createCriteria();
+//		criteria.andEqualTo("username", username);
+//		return userMapper.selectByExample(example).get(0);
+		return userMapper.getUserByUsername(username);
 	}
 }

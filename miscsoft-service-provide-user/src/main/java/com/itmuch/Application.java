@@ -29,7 +29,7 @@ public class Application extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 //		long start = System.currentTimeMillis();
 		SpringApplication.run(Application.class, args);
-//		log.info("started, took " + (System.currentTimeMillis() - start) + "ms");
+//		log.info("started, took o.o.o.o.o.O" + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	// @Bean
