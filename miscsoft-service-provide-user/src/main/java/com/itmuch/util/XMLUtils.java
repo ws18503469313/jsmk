@@ -39,7 +39,7 @@ public class XMLUtils {
 				if (child.getName().equals(attr.getName())) {
 					Method m = result.getClass().getDeclaredMethod("set" + attr.getName(),
 							new Class[] { String.class });
-					log.info(m.toString());
+//					log.info(m.toString());
 					m.invoke(result, child.getText());
 				}
 			}

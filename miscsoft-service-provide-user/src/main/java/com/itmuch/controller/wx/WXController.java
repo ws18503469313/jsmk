@@ -77,7 +77,8 @@ public class WXController extends BaseController{
 	@RequestMapping(value = "/checkSignature",  method = RequestMethod.POST)
 	public void eventpush(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		// 1.判断推动的数据类型
-
+		req.setCharacterEncoding("UTF-8");
+		resp.setCharacterEncoding("UTF-8");
 		log.info("==================eventpush:POST========================");
 
 		PrintWriter out = resp.getWriter();

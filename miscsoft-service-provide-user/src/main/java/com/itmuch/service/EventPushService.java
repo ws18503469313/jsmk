@@ -1,5 +1,11 @@
 package com.itmuch.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +56,7 @@ public class EventPushService {
 			
 			result.setFromUserName(message.getToUserName());
 			result.setToUserName(message.getFromUserName());
-			result.setContent("hello world-您说如的内容是:"+message.getContent());
+			result.setContent(tuLinAPI(message.getContent()));
 			result.setMsgId(message.getMsgId());
 			result.setCreateTime(String.valueOf(System.currentTimeMillis()/1000));
 			result.setMsgType(MessageConstant.REQ_MESSAGE_TYPE_TEXT);
@@ -58,11 +64,42 @@ public class EventPushService {
 		log.info("o.o.o.o.O.return result:"+result.toString()+"-----------------------");
 		return XMLUtils.pojoToXML(result);
 	}
-//	oYqzm5TQOoLAOMO0miYzVQ3MwqyA wangshuai的openid
-	public static void main(String[] args) {
-		
-		
-	}
+	
+	private static final String APIKEY = "5e673f7ac02741899fa27ec8c160b147";
+	/**
+	 * 调取图灵接口
+	 * @param quesiton
+	 * @return
+	 * @throws IOException
+	 */
+	private static String tuLinAPI(String quesiton) throws IOException {
+        //接入机器人，输入问题
+        
+        String INFO = URLEncoder.encode(quesiton, "utf-8");//这里可以输入问题
+        String getURL = "http://www.tuling123.com/openapi/api?key=" + APIKEY + "&info=" + INFO;
+//		String getURL = "http://www.wssmjy.com";
+        URL getUrl = new URL(getURL);
+        HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
+        connection.connect();
+
+        // 取得输入流，并使用Reader读取
+        BufferedReader reader = new BufferedReader(new InputStreamReader( connection.getInputStream(), "utf-8"));
+        StringBuffer sb = new StringBuffer();
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        // 断开连接
+        connection.disconnect();
+        String[] ss = new String[10];
+        String s = sb.toString();
+        String answer;
+	     ss = s.split(":");
+	    answer = ss[ss.length-1];
+	    answer = answer.substring(1,answer.length()-2);
+	    return answer;
+    }
 	/**
 	 * 获取微信公众号的ACCESS_TOKEN
 	 * 先从redis中获取,没有/失效了再从wx服务器获取,再保存到redis中
