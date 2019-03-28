@@ -28,6 +28,7 @@ import com.google.common.collect.Maps;
 import com.itmuch.controller.BaseController;
 import com.itmuch.model.User;
 import com.itmuch.model.WXResult;
+import com.itmuch.service.EventPushService;
 import com.itmuch.service.UserService;
 import com.itmuch.service.WXResultService;
 import com.itmuch.util.CheckUtils;
@@ -48,7 +49,8 @@ public class WXController extends BaseController{
 	private UserService userService;
 	@Autowired
 	private WXResultService wxResultService;
-	
+	@Autowired
+	private EventPushService eventPushService;
 	private static final String GRANT_TYPE = "authorization_code";
 	
 	
@@ -56,7 +58,7 @@ public class WXController extends BaseController{
 	
 	/**
 	 * 微信公众号开启微信开发者模式校验方法
-	 * @param signature
+	 * @param signature	
 	 * @param timestamp
 	 * @param nonce
 	 * @param echostr
@@ -64,15 +66,16 @@ public class WXController extends BaseController{
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/checkSignature",  method = RequestMethod.GET)
-	public void checkSignature(String signature, String timestamp, String nonce, String echostr, HttpServletRequest req,HttpServletResponse resp) throws IOException {
+	public void checkSignature(String echostr, HttpServletRequest req,HttpServletResponse resp) throws IOException {
 		PrintWriter writer = resp.getWriter();
-		if (CheckUtils.checkSignature(signature, timestamp, nonce)) {
+		if (CheckUtils.checkSignature(req)) {
 			writer.write(echostr);
 		}
+		
 	}
 	
 	@RequestMapping(value = "/checkSignature",  method = RequestMethod.POST)
-	public void busyness(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	public void eventpush(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		// 1.判断推动的数据类型
 
 		log.debug("==================eventpush:POST========================");
@@ -81,7 +84,13 @@ public class WXController extends BaseController{
 
 		if (CheckUtils.checkSignature(req)) {
 
-		String message = eventPushService.DoEvent(request);
+		String message = null;
+		try {
+			message = eventPushService.doEvent(req);
+		} catch (Exception e) {
+			message = "sorry world";
+			e.printStackTrace();
+		}
 
 		out.write(message);
 
@@ -107,7 +116,11 @@ public class WXController extends BaseController{
 		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
 		subject.login(token);
 		req.getSession().setAttribute("user", getCurrentUser());
-		
+		//判断有没有绑定
+		WXResult exist = wxResultService.load(user.getId());
+		if(exist == null) {
+			
+		}
 		//微信获取sessionkey和openid
 		log.info("coed :"+ code);
 		String url = "https://api.weixin.qq.com/sns/jscode2session";
@@ -124,6 +137,7 @@ public class WXController extends BaseController{
 		Md5Hash thirdKey = new Md5Hash(user.getPassword(), user.getUsername(), 2);
 		result.setUserId(getCurrentUser().getId());
 		result.setThirdKey(thirdKey.toString());
+		
 		wxResultService.save(result);
 		
 		log.info(result.toString());

@@ -16,4 +16,8 @@ public class WXResultService {
 	public void save(WXResult result) {
 		wxResultMapper.insert(result);
 	}
+	
+	public WXResult load(String id) {
+		return wxResultMapper.selectByPrimaryKey(id);
+	}
 }

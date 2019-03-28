@@ -28,7 +28,24 @@ public class JedisUtil {
 		}
 		
 	}
-
+	public String setWithExpire(String key,String value, int time) {
+		Jedis jedis = getResource();
+		try {
+			jedis.set(key, value, SET_SCHAME, TIME_UNIT, time);
+			return value;
+		} finally {
+			jedis.close();
+		}
+		
+	}
+	/**
+	 * 不存在时才set
+	 */
+	private static final String SET_SCHAME = "NX";
+	/**
+	 * 秒
+	 */
+	private static final String TIME_UNIT = "EX";
 	public void expire(byte[] key, int i) {
 		Jedis jedis = getResource();
 		try {

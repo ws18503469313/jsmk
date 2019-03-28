@@ -5,6 +5,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +16,10 @@ public class CheckUtils {
 	private static final Logger log = LoggerFactory.getLogger(CheckUtils.class);
 	private static final String TOKEN = "SYKJ";
 	
-	public static boolean checkSignature(String signature, String timestamp, String nonce ) {
-		
+	public static boolean checkSignature(HttpServletRequest req ) {
+		String signature = req.getParameter("signature");
+		String timestamp = req.getParameter("timestamp"); 
+		String nonce = req.getParameter("nonce");
 		String [] arr = new String[] {TOKEN, timestamp, nonce};
 		Arrays.sort(arr);
 		String temp = 	StringUtils.join(arr);
@@ -26,7 +30,7 @@ public class CheckUtils {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(checkSignature("123", "adab", "1231cdsc"));
+//		System.out.println(checkSignature("123", "adab", "1231cdsc"));
 	}
 
     public static String getSha1(String str){

@@ -13,5 +13,29 @@ public class WXConfiguration {
 	@Value("${wx.appid}")
 	private String appid;
 	
+	@Value("${sykj.wx.secret}")
+	private String syAppid;
+	
+	@Value("${sykj.wx.appid}")
+	private String sySecret;
+	
+	@Value("${sykj.wx.template}")
+	
+	private String template;
+	public String getSyAppid() {
+		return syAppid;
+	}
+
+	public String getSySecret() {
+		return sySecret;
+	}
+
+	public String getTemplate() {
+		return template;
+	}
+
+	
+	
+	
 	
 }

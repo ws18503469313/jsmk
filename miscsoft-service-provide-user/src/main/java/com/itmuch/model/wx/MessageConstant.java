@@ -1,4 +1,4 @@
-package com.itmuch.model;
+package com.itmuch.model.wx;
 
 
 /**
