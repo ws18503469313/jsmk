@@ -41,12 +41,11 @@ public class XMLUtils {
 							new Class[] { String.class });
 					log.info(m.toString());
 					m.invoke(result, child.getText());
-					continue;
 				}
 			}
 		}
 		in.close();
-		log.info("o.o.o.o.O.dom4j解析结果:"+result.toString()+"--------------------------");
+		log.info("o.o.o.o.O.dom4j解析结果-pojo:"+result.toString()+"--------------------------");
 		return result;
 	}
 
@@ -61,7 +60,7 @@ public class XMLUtils {
 		for (Element ele : children) {
 			result.put(ele.getName(), ele.getText());
 		}
-		log.info("o.o.o.o.O.dom4j解析结果:"+result.toString()+"--------------------------");
+		log.info("o.o.o.o.O.dom4j解析结果-map:"+result.toString()+"--------------------------");
 		return result;
 	}
 

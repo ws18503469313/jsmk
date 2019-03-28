@@ -23,9 +23,7 @@ public class CheckUtils {
 		String [] arr = new String[] {TOKEN, timestamp, nonce};
 		Arrays.sort(arr);
 		String temp = 	StringUtils.join(arr);
-		log.info("o.o.o.o.o.params:"+temp);
 		String result = getSha1(temp);
-		log.info("o.o.o.o.o.result:"+result);
 		return signature.equals(result);
 	}
 	

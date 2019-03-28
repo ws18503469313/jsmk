@@ -87,6 +87,7 @@ public class EventPushService {
 		JSONObject json = JSON.parseObject(result);
 		
 		accessToken = json.get("access_token").toString();
+		log.info("o.o.o.o.O.调取wx接口获取的结果"+json.toString());
 		jedisUtil.setWithExpire(ACCESS_TOKEN_KEY, accessToken, json.getIntValue("expires_in"));
 		return accessToken;
 	}
