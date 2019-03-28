@@ -78,7 +78,7 @@ public class WXController extends BaseController{
 	public void eventpush(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		// 1.判断推动的数据类型
 
-		log.debug("==================eventpush:POST========================");
+		log.info("==================eventpush:POST========================");
 
 		PrintWriter out = resp.getWriter();
 

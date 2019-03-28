@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import com.itmuch.util.XMLUtils;
 @Service
 public class EventPushService {
 	
+	
+	private static final Logger log = LoggerFactory.getLogger(EventPushService.class);
 	@Autowired
 	private WXConfiguration wxConfiguration;
 	@Autowired
@@ -34,21 +38,25 @@ public class EventPushService {
 	
 	private static final String ACCESS_TOKEN_KEY = "SYKY_ACCESS_TOKEN_KEY";
 	public String doEvent(HttpServletRequest req) throws Exception {
+		
 		String accessToken = getAccessToken();
 		TEMPALTE_URL = TEMPALTE_URL.replace("ACCESS_TOKEN", accessToken);
-		List<String> openIDs = Lists.newArrayList("oYqzm5TQOoLAOMO0miYzVQ3MwqyA");
+		log.info("o.o.o.o.o.O.ACCESS_TOKEN:"+accessToken+"------------------------");
+//		List<String> openIDs = Lists.newArrayList("oYqzm5TQOoLAOMO0miYzVQ3MwqyA");
 //		HttpClientUtil.doPostJson(TEMPALTE_URL, templateMessage(openIDs));
-		WXTextMessage message = XMLUtils.xmlToPojo(WXTextMessage.class, req);
+//		WXTextMessage message = XMLUtils.xmlToPojo(WXTextMessage.class, req);
+		Map<String, String> map = XMLUtils.xmltoMap(req);
 		WXTextMessage result = new WXTextMessage();
-		if(MessageConstant.REQ_MESSAGE_TYPE_TEXT.equals(message.getMsgType())) {
+		if(MessageConstant.REQ_MESSAGE_TYPE_TEXT.equals(map.get("MsgType"))) {
 			
-			result.setFromUserName(message.getToUserName());
-			result.setToUserName(message.getFromUserName());
+			result.setFromUserName(map.get("ToUserName"));
+			result.setToUserName(map.get("FromUserName"));
 			result.setContent("hello world");
-			result.setMsgId(message.getMsgId());
+			result.setMsgId(map.get("MsgId"));
 			result.setCreateTime(String.valueOf(System.currentTimeMillis()/1000));
 			result.setMsgType(MessageConstant.REQ_MESSAGE_TYPE_TEXT);
 		}
+		log.info("o.o.o.o.O.return result:"+result.toString()+"-----------------------");
 		return XMLUtils.pojoToXML(result);
 	}
 //	oYqzm5TQOoLAOMO0miYzVQ3MwqyA wangshuai的openid
