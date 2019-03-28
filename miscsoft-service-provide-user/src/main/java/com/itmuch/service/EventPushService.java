@@ -39,23 +39,23 @@ public class EventPushService {
 	private static final String ACCESS_TOKEN_KEY = "SYKY_ACCESS_TOKEN_KEY";
 	public String doEvent(HttpServletRequest req) throws Exception {
 		
-		String accessToken = getAccessToken();
-		TEMPALTE_URL = TEMPALTE_URL.replace("ACCESS_TOKEN", accessToken);
-		log.info("o.o.o.o.o.O.ACCESS_TOKEN:"+accessToken+"------------------------");
+//		String accessToken = getAccessToken();
+//		TEMPALTE_URL = TEMPALTE_URL.replace("ACCESS_TOKEN", accessToken);
+//		log.info("o.o.o.o.o.O.ACCESS_TOKEN:"+accessToken+"------------------------");
 //		List<String> openIDs = Lists.newArrayList("oYqzm5TQOoLAOMO0miYzVQ3MwqyA");
 //		HttpClientUtil.doPostJson(TEMPALTE_URL, templateMessage(openIDs));
 //		WXTextMessage message = XMLUtils.xmlToPojo(WXTextMessage.class, req);
 		Map<String, String> map = XMLUtils.xmltoMap(req);
 		WXTextMessage result = new WXTextMessage();
-		if(MessageConstant.REQ_MESSAGE_TYPE_TEXT.equals(map.get("MsgType"))) {
+//		if(MessageConstant.REQ_MESSAGE_TYPE_TEXT.equals(map.get("MsgType"))) {
 			
 			result.setFromUserName(map.get("ToUserName"));
-			result.setToUserName(map.get("FromUserName"));
+			result.setToUserName("oYqzm5TQOoLAOMO0miYzVQ3MwqyA");
 			result.setContent("hello world");
 			result.setMsgId(map.get("MsgId"));
 			result.setCreateTime(String.valueOf(System.currentTimeMillis()/1000));
 			result.setMsgType(MessageConstant.REQ_MESSAGE_TYPE_TEXT);
-		}
+//		}
 		log.info("o.o.o.o.O.return result:"+result.toString()+"-----------------------");
 		return XMLUtils.pojoToXML(result);
 	}
