@@ -84,13 +84,13 @@ public class WXController extends BaseController{
 
 		if (CheckUtils.checkSignature(req)) {
 
-		String message = null;
-		try {
-			message = eventPushService.doEvent(req);
-		} catch (Exception e) {
-			message = "sorry world";
-			e.printStackTrace();
-		}
+			String message = null;
+			try {
+				message = eventPushService.doEvent(req);
+			} catch (Exception e) {
+				message = "sorry world";
+				e.printStackTrace();
+			}
 
 		out.write(message);
 
