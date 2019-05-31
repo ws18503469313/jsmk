@@ -127,7 +127,7 @@ a:hover {
 	                  $.ajax({
 		  		            type: "POST",
 		  		            url: "/access/save",
-		  		            data: {'title':title,'url':url,'parent':'#'},
+		  		            data: {'title':title,'url':'#','parent':'#'},
 		  		            dateType:"json",
 		  		          	async: false, 
 		  		            success: function (data) {

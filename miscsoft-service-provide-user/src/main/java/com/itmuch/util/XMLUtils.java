@@ -34,7 +34,7 @@ public class XMLUtils {
 		List<Element> children = root.elements();
 		// 将xml转换为pojo
 		T result = (T) cls.newInstance();
-		for (Field attr : WXTextMessage.class.getDeclaredFields()) {
+		for (Field attr : cls.getDeclaredFields()) {
 			for (Element child : children) {
 				if (child.getName().equals(attr.getName())) {
 					Method m = result.getClass().getDeclaredMethod("set" + attr.getName(),

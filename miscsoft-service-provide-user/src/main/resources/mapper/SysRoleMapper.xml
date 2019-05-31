@@ -30,7 +30,7 @@
 		SELECT role_id from sys_user_role where user_id = #{userId}  
   </select>
   
-  <select id="checkIsExist" resultType="java.lang.String" parameterType="com.itmuch.model.Role">
+  <select id="checkIsExist" resultType="com.itmuch.model.Role" parameterType="com.itmuch.model.Role">
   		SELECT rolename FROM sys_role WHERE rolename = #{rolename}
   </select>
   

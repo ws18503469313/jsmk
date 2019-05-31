@@ -100,6 +100,10 @@ public class EventPushService {
 	    answer = answer.substring(1,answer.length()-2);
 	    return answer;
     }
+	public static void main(String[] args) {
+		EventPushService service = new EventPushService();
+		service.getAccessToken();
+	}
 	/**
 	 * 获取微信公众号的ACCESS_TOKEN
 	 * 先从redis中获取,没有/失效了再从wx服务器获取,再保存到redis中
@@ -107,16 +111,18 @@ public class EventPushService {
 	 */
 	private String getAccessToken() {
 		String accessToken = null;
-		accessToken = String.valueOf(jedisUtil.get(ACCESS_TOKEN_KEY.getBytes()));
-		if(accessToken != null) {
-			return accessToken;
-		}
+//		accessToken = String.valueOf(jedisUtil.get(ACCESS_TOKEN_KEY.getBytes()));
+//		if(accessToken != null) {
+//			return accessToken;
+//		}
 		String url = "https://api.weixin.qq.com/cgi-bin/token";
 //		grant_type=client_credential&appid=APPID&secret=APPSECRET
 		Map<String,String> params = Maps.newHashMap();
 		params.put("grant_type", "client_credential");
-		params.put("appid", wxConfiguration.getSyAppid());
-		params.put("secret", wxConfiguration.getSySecret());
+		params.put("appid", "wx3f4e6b31d77b67b8");
+		params.put("secret", "aca8745f36fd6b8a44e64443407dc568");
+//		params.put("appid", wxConfiguration.getSyAppid());
+//		params.put("secret", wxConfiguration.getSySecret());
 		
 		String result = HttpClientUtil.doGet(url, params);
 		
@@ -124,7 +130,7 @@ public class EventPushService {
 		
 		accessToken = json.get("access_token").toString();
 		log.info("o.o.o.o.O.调取wx接口获取的结果"+json.toString());
-		jedisUtil.setWithExpire(ACCESS_TOKEN_KEY, accessToken, json.getIntValue("expires_in"));
+		jedisUtil.setWithExpire(ACCESS_TOKEN_KEY, accessToken, Integer.valueOf(json.get("expires_in").toString()));
 		return accessToken;
 	}
 	/**

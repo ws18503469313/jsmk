@@ -83,4 +83,33 @@ public class JedisUtil {
 			jedis.close();
 		}
 	}
+	
+	public void mapPut(String key, String name, String value) {
+		Jedis jedis = null;
+		try {
+			jedis = getResource();
+			if (jedis != null) {
+					jedis.hset(key, name, value);
+			}
+		} finally {
+			if (jedis != null) {
+				jedis.close();
+			}
+		}
+	} 
+	public String mapGet(String key, String name) {
+		Jedis jedis = null;
+		try {
+			jedis = getResource();
+			if (jedis != null) {
+					return  jedis.hget(key, name);
+			}
+			
+		} finally {
+			if (jedis != null) {
+				jedis.close();
+			}
+		}
+		return null;
+	}
 }

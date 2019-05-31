@@ -1,7 +1,6 @@
 package com.itmuch.Configuration;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;

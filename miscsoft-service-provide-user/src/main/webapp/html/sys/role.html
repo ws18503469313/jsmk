@@ -202,7 +202,7 @@
       		var detailForm = layer.getChildFrame('form', index);
     		var rolename = $('#rolename', detailForm).val();//直接拿到子窗口的值
     		var desc = $('#desc', detailForm).val();//直接拿到子窗口的值
-//    		console.log("id:"+id+",rolename:"+rolename+",desc:"+desc);
+    		console.log("id:"+id+",rolename:"+rolename+",desc:"+desc);
     		$.ajax({
 	           type: "POST",
 	           url: "/role/add",
@@ -233,5 +233,6 @@
       });
 	}
 </script>
+
 </body>
 </html>

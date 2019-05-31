@@ -110,6 +110,7 @@ public class WXController extends BaseController{
 	 * @return
 	 */
 	@RequestMapping("/onLogin")
+	@ResponseBody
 	@Transactional
 	public JSONResult onLogin(String code,User user, HttpServletRequest req, HttpServletResponse resp) {
 		//在系统中登陆
@@ -118,10 +119,10 @@ public class WXController extends BaseController{
 		subject.login(token);
 		req.getSession().setAttribute("user", getCurrentUser());
 		//判断有没有绑定
-		WXResult exist = wxResultService.load(user.getId());
-		if(exist == null) {
-			
-		}
+//		WXResult exist = wxResultService.
+//		if(exist == null) {
+//			
+//		}
 		//微信获取sessionkey和openid
 		log.info("coed :"+ code);
 		String url = "https://api.weixin.qq.com/sns/jscode2session";
@@ -138,8 +139,7 @@ public class WXController extends BaseController{
 		Md5Hash thirdKey = new Md5Hash(user.getPassword(), user.getUsername(), 2);
 		result.setUserId(getCurrentUser().getId());
 		result.setThirdKey(thirdKey.toString());
-		
-		wxResultService.save(result);
+//		wxResultService.save(result);
 		
 		log.info(result.toString());
 		

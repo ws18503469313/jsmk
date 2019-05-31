@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,9 +51,10 @@ public class RoleController extends CoreController{
 	@RequestMapping("add")
 	@RequiresRoles(value="manager")
 	@ResponseBody
+//	public JSONResult add(String id, String rolename, String descprit) {
 	public JSONResult add(Role role) {
 		Role exist = roleMapper.checkIsExist(role);
-		if(exist != null) {
+		if(exist != null && !exist.getRolename().equals(role.getRolename())) {
 			throw new BizException("该角色名称已存在");
 		}
 		if(StringUtils.isBlank(role.getId())) {

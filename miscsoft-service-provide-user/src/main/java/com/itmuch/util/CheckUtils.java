@@ -17,6 +17,7 @@ public class CheckUtils {
 	private static final String TOKEN = "SYKJ";
 	
 	public static boolean checkSignature(HttpServletRequest req ) {
+		log.info("==================check-checkSignature========================");
 		String signature = req.getParameter("signature");
 		String timestamp = req.getParameter("timestamp"); 
 		String nonce = req.getParameter("nonce");

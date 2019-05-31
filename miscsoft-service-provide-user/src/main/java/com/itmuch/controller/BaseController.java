@@ -1,8 +1,10 @@
 package com.itmuch.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -44,13 +46,20 @@ public class BaseController extends CoreController{
 		return "redirect:/main/index";
 	}	
 	@RequestMapping("ajaxLogin")
-	@ResponseBody
-	public JSONResult ajaxLogin(User user, HttpServletRequest req) {
+//	@ResponseBody
+	public void ajaxLogin(User user, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		resp.setHeader("Access-Control-Allow-Origin", "*");
 		Subject subject = SecurityUtils.getSubject();
 		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
 		subject.login(token);
 		req.getSession().setAttribute("user", getCurrentUser());
-		return JSONResult.ok(getCurrentUser());
+//		return JSONResult.ok(getCurrentUser());
+		String result = JSONResult.ok(getCurrentUser()).toString();
+		//前端传过来的回调函数名称
+		String callback = req.getParameter("callback");
+		//用回调函数名称包裹返回数据，这样，返回数据就作为回调函数的参数传回去了
+		result = callback + "(" + result + ")";
+		resp.getWriter().write(result);
 	}
 	/**
 	 * 返回主页,并返回权限树

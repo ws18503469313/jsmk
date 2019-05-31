@@ -28,13 +28,9 @@ public class WXResult extends BaseModel{
      */
     @Column(name = "open_id")
 	private String openid;
-    /**
-     * 保存在客户端的登陆凭证
-     */
-    @Column(name = "third_key")
-	private String thirdKey;
-	
-
+	@Column(name="third_key")
+    private String thirdKey;
+    
 	public String getSession_key() {
 		return session_key;
 	}
@@ -53,17 +49,14 @@ public class WXResult extends BaseModel{
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
+	
 	public String getThirdKey() {
 		return thirdKey;
 	}
 	public void setThirdKey(String thirdKey) {
 		this.thirdKey = thirdKey;
 	}
-	@Override
-	public String toString() {
-		return "WXResult [userId=" + userId + ", session_key=" + session_key + ", openid=" + openid + ", thirdKey="
-				+ thirdKey + "]";
-	}
+	
 
 	
 	

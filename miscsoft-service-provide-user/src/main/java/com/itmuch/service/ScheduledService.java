@@ -15,7 +15,7 @@ import com.itmuch.model.Note;
 import com.itmuch.util.JedisUtil;
 import com.itmuch.util.SerialaizerUtils;
 
-@Component
+//@Component
 public class ScheduledService {
 	
 	
