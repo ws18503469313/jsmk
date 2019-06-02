@@ -5,13 +5,13 @@ import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -54,18 +54,25 @@ public class ExcelUtil {
 	}
 	static SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
 	/**
-	 * 
+	 * 将输入的参数转换为时间后进行排序
 	 * @param strs
 	 * @return
 	 * @throws ParseException
 	 */
 	private static Date[] convertStringToDate(List<String> strs) throws ParseException {
 		Date[] datas = new Date[strs.size()];
+		long [] timemills = new long[strs.size()];
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		int i = 0;
 		for (String string : strs) {
 			Date date = sdf.parse(string);
-			datas[i++] = date;
+			
+			timemills[i++] = date.getTime();
+		}
+		Arrays.sort(timemills);
+		i = 0;
+		for (long timemill : timemills) {
+			datas[i++] = new Date(timemill);
 		}
 		return datas;
 	}
@@ -235,31 +242,7 @@ public class ExcelUtil {
 		for (int colum = 1; colum < columns; colum++) {
 			// 获取当前列第一个时间点 this
 			Date thisFirst = convertStringToDate(sheet.getRow(firstRow).getCell(colum).toString());
-//			int currentColums = colum;
 			boolean drawn = false;
-//			while (currentColums > 0) {
-//				// 获取前一列最后一个时间点 pre
-//				Date preLast = convertStringToDate(sheet.getRow(lastRow).getCell(--currentColums).toString());
-//				// 如过有前一列
-//				if (preLast != null) {
-//					// 如果this 大于 pre 则设置和前一列颜色相同
-//					if (thisFirst.compareTo(preLast) == 1) {
-//						CellStyle cellStyle = (HSSFCellStyle) sheet.getRow(lastRow).getCell(colum - 1).getCellStyle();
-//						HSSFColor color = (HSSFColor) cellStyle.getFillForegroundColorColor();
-//						String lastUsingTimeString = useing.get(color.getClass());
-//						Date lastUsingTime  = convertStringToDate(lastUsingTimeString);
-//						if(thisFirst.compareTo(lastUsingTime) ==1) {
-//							// 给当前列上色
-//							setColomColor(sheet, colum, cellStyle);
-//							//更新这台电脑最后的使用时间
-//							useing.put(color.getClass(), sheet.getRow(lastRow).getCell(colum).toString());
-//							drawn = true;
-//							break;
-//						}
-//						
-//					}
-//				}
-//			}
 			for (Class<?> clz : useing.keySet()) {
 				Cell cell = useing.get(clz);
 				String lastUsingTimeString = cell.getStringCellValue();
