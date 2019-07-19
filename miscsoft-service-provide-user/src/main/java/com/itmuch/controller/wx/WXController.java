@@ -8,6 +8,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.itmuch.cache.RedisCache;
+import com.itmuch.dto.LocationDTO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -51,6 +55,8 @@ public class WXController extends BaseController{
 	private WXResultService wxResultService;
 	@Autowired
 	private EventPushService eventPushService;
+	@Autowired
+	private RedisCache redisCache;
 	private static final String GRANT_TYPE = "authorization_code";
 	
 	
@@ -102,22 +108,43 @@ public class WXController extends BaseController{
 		}
 	}
 	/**
-	 * 微信小程序登陆方法
+	 * 获取用户的access_token
 	 * @param code
 	 * @param user
 	 * @param req
 	 * @param resp
 	 * @return
 	 */
-	@RequestMapping("/onLogin")
+	@RequestMapping("/getAccessToken")
 	@ResponseBody
 	@Transactional
 	public JSONResult onLogin(String code,User user, HttpServletRequest req, HttpServletResponse resp) {
-		//在系统中登陆
-		Subject subject = SecurityUtils.getSubject();
+		//2019-7-19考虑一进入小程序,请求获取用户access_token,自动发送地址,不需要登陆环节
+		//**注释开始
+		//在系统中登陆**/
+		/*Subject subject = SecurityUtils.getSubject();
 		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
 		subject.login(token);
-		req.getSession().setAttribute("user", getCurrentUser());
+		req.getSession().setAttribute("user", getCurrentUser());*/
+
+
+		//将登陆信息保存到数据库
+//		Md5Hash thirdKey = new Md5Hash(user.getPassword(), user.getUsername(), 2);
+//		result.setUserId(getCurrentUser().getId());
+//		result.setThirdKey(thirdKey.toString());
+//		wxResultService.save(result);
+
+		//将登陆凭证返回给客户
+		//小程序貌似不支持cookie
+//		Cookie cookie = new Cookie("thirdKey", thirdKey.toString());
+//		cookie.setMaxAge(60*60*24*30*365);
+//		resp.addCookie(cookie);
+
+
+//		JSONObject loginToken = new JSONObject();
+//		loginToken.put("id",result.getOpenid());
+//		loginToken.put("secrit", thirdKey.toString());
+		//**注释结束**/
 		//判断有没有绑定
 //		WXResult exist = wxResultService.
 //		if(exist == null) {
@@ -133,20 +160,20 @@ public class WXController extends BaseController{
 		params.put("grant_type", GRANT_TYPE);
 		String json = HttpClientUtil.doGet(url, params);
 		WXResult result = JsonUtils.jsonToPojo(json, WXResult.class);
-		
-		
-		//将登陆信息保存到数据库
-		Md5Hash thirdKey = new Md5Hash(user.getPassword(), user.getUsername(), 2);
-		result.setUserId(getCurrentUser().getId());
-		result.setThirdKey(thirdKey.toString());
-//		wxResultService.save(result);
-		
+
 		log.info(result.toString());
-		
-		//将登陆凭证返回给客户
-		Cookie cookie = new Cookie("thirdKey", thirdKey.toString());
-		cookie.setMaxAge(60*60*24*30*365);
-		resp.addCookie(cookie);
-		return JSONResult.ok(thirdKey.toString());
+
+		return JSONResult.ok(result.getOpenid());
+	}
+
+	/**
+	 * 用户访问小程序上传位置信息
+	 * @param locationDTO
+	 */
+	@RequestMapping("/postAddress")
+	@ResponseBody
+	public void postAddress(LocationDTO locationDTO){
+//		redisCache.put("")
+		System.out.println(JSON.toJSONString(locationDTO));
 	}
 }

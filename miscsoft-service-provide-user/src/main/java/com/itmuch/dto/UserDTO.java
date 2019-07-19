@@ -13,7 +13,10 @@ public class UserDTO extends User{
 	 * 	角色名称
 	 */
 	private String rolename;
-
+	/**
+	 *用户管理的layoutid
+	 */
+	private Long layoutId;
 	public String getRolename() {
 		return rolename;
 	}
@@ -21,7 +24,14 @@ public class UserDTO extends User{
 	public void setRolename(String rolename) {
 		this.rolename = rolename;
 	}
-	
+
+	public Long getLayoutId() {
+		return layoutId;
+	}
+
+	public void setLayoutId(Long layoutId) {
+		this.layoutId = layoutId;
+	}
 	
 	
 }

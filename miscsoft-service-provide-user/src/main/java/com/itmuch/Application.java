@@ -4,7 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner.Mode;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -40,5 +43,4 @@ public class Application extends SpringBootServletInitializer {
 	// return resolver;
 	// }
 	// jsp页面的视图解析器，解析到webapp下的jsp/目录下查找对应的jsp页面
-
 }

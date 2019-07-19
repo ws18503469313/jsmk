@@ -17,13 +17,13 @@ import com.itmuch.BaseTests;
 public class TestConcurrent extends BaseTests {
 	
 	
-	@Test
-	private void startThread() {
-		for (int i = 0; i < 5000; i++) {
-			ThreadConnector connector = new ThreadConnector();
-			connector.start();
-		}
-	}
+//	@Test
+//	private void startThread() {
+//		for (int i = 0; i < 5000; i++) {
+//			ThreadConnector connector = new ThreadConnector();
+//			connector.start();
+//		}
+//	}
 
 
 	public static class ThreadConnector extends Thread {
