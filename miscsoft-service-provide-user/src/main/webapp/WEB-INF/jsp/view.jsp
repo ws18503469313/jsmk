@@ -130,7 +130,7 @@ function registe() {
     			  	  return false;
     			} 
     		  	$.ajax({
-    			  	url: "/addUser",
+    			  	url: "/user/addUser",
     		        type: "POST",
     		        data: {'username':username, 'password':password,'name':name},
     		        dateType:"json",

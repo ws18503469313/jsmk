@@ -3,11 +3,14 @@ package com.itmuch.service;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+import com.itmuch.event.Logvent;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,8 @@ public class UserService {
 
 	@Autowired
 	private Sid sid;
+	@Autowired
+	private ApplicationContext applicationContext;
 
 	@Transactional
 	public String addUser(User user) {
@@ -45,6 +50,7 @@ public class UserService {
 		user.setBirthday(new Date());
 		user.setId(sid.nextShort());
 		userMapper.insert(user);
+		applicationContext.publishEvent(new Logvent(this, "用户注册成功:"+ JSON.toJSONString(user)));
 		return "操作成功";
 	}
 
