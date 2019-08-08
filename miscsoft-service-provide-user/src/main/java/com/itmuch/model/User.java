@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
 
+import com.itmuch.util.ExportExcel;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,16 +18,17 @@ public class User implements Serializable{
 
 	@Id
     private String id;
-
+    @ExportExcel(name = "昵称", order = 10)
     private String name;
-
+    @ExportExcel(name = "用户名", order = 2)
     private String username;
-
+    @ExportExcel(name = "年龄", order = 1)
     private Integer age;
     
     private String password;
     
     private Double balance;
+    @ExportExcel(name = "创建时间", order = 4)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date birthday;
 
