@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -29,6 +30,11 @@ public class ContextFilter implements Filter {
 	@Override
     public void doFilter(ServletRequest arg0, ServletResponse arg1, FilterChain chain) throws IOException,
             ServletException {
+		//允许跨域
+		HttpServletResponse response = (HttpServletResponse) arg1;
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Access-Control-Allow-Method", "*");
+		//将schame添加到session中
 		HttpServletRequest request = (HttpServletRequest) arg0;
 		HttpSession session = request.getSession();
 	    String ctxPath = (String) session.getAttribute("ctx");

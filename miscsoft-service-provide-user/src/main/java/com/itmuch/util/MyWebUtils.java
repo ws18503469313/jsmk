@@ -23,6 +23,7 @@ public class MyWebUtils {
 	}
 	
 	public static boolean isAjax(HttpServletRequest httpRequest) {
+		System.out.println(httpRequest.getHeader("X-Requested-With").toString());
 		return (httpRequest.getHeader("X-Requested-With") != null
 				&& "XMLHttpRequest".equals(httpRequest.getHeader("X-Requested-With").toString()));
 	}

@@ -9,13 +9,13 @@
 		class="org.apache.log4j.ConsoleAppender">
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern"
-				value="%-5p %d{yyyy-MM-dd HH:mm:ss,SSS} %m%n" />
+				   value="%-5p %d{yyyy-MM-dd HH:mm:ss,SSS} %t %m (%F:%L) %n" />
 		</layout>
 	</appender>
 
 	<appender name="Daily_File"
 		class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="/logs/shiroLog.log" />
+		<param name="file" value="/logs/userservice.log" />
 		<param name="datePattern" value="'.'yyyy-MM-dd" />
 		<param name="append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">

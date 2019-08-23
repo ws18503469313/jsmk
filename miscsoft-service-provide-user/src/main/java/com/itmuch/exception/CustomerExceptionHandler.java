@@ -29,7 +29,7 @@ public class CustomerExceptionHandler {
 
 	@ExceptionHandler(value = Exception.class)
 	public Object errorHandler(HttpServletRequest reqest, HttpServletResponse response, Exception e) throws Exception {
-		e.printStackTrace();
+//		e.printStackTrace();
 		log.error("error_message---------------------" + e.getMessage());
 		if (MyWebUtils.isAjax(reqest)) {
 

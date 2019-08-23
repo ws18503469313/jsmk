@@ -107,5 +107,9 @@ public class Access {
 		this.parent = parent;
 	}
 	
-   
+
+   public static void main(String args[]) throws Exception{
+        ModelWithBuilder model = new ModelWithBuilder.Builder().id(1).name("ada").build();
+        System.out.println(model.toString());
+   }
 }
