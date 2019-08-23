@@ -84,6 +84,13 @@ public class IndexController extends CoreController{
 		User user = userServicer.beforTransation();
 		return JSONResult.ok(user.getAge());
 	}
+
+	@RequestMapping("test")
+	@ResponseBody
+	public JSONResult test(HttpServletResponse response) {
+		int i = 1/0;
+		return JSONResult.ok();
+	}
 	/**
 	 * 随便写一个文件,这个url没有用
 	 * @return

@@ -64,7 +64,7 @@ public class CategrayController {
 	}
 	
 	@RequestMapping("save")
-	@RequiresRoles(value="manager")
+//	@RequiresRoles(value="manager")
 	@ResponseBody
 	public JSONResult save(String name) {
 		String msg = categrayService.save(name);
@@ -72,7 +72,7 @@ public class CategrayController {
 	}
 	@RequestMapping("delete")
 	@ResponseBody
-	@RequiresPermissions(value = {"categray.delete"})
+//	@RequiresPermissions(value = {"categray.delete"})
 	public JSONResult delete(String id) {
 		
 		categrayMapper.deleteByPrimaryKey(id);

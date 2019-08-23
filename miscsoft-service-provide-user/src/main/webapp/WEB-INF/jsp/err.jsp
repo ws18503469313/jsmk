@@ -17,5 +17,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 </head>
 <body>
 	<h1>错误页面</h1>
+	<label>访问地址:</label><p>${url}</p>
+	<label>错误原因:</label><p>${exception.message}</p>
 </body>
 </html>

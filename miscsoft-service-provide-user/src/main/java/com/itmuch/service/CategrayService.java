@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.itmuch.exception.BizException;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,16 +34,17 @@ public class CategrayService {
 		Example example = new Example(Categray.class);
 		Example.Criteria criteria = example.createCriteria();
 		if(!StringUtils.isEmpty(name)) {
-			criteria.andLike("name", "%"+name+"%");
+			criteria.andEqualTo("name", name);
 		}
 		List<Categray> result = categrayMapper.selectByExample(example);
 		if(result.size() > 0) {
-			return "该目录已存在";
+			throw new BizException("该目录已存在");
 		}
 		Categray categray = new Categray();
 		categray.setName(name);
 		categray.setCreateTime(new Date());
 		categray.setId(sid.nextShort());
+		categray.setIsDelete(0);
 		categrayMapper.insert(categray);
 		return "ok";
 	}
