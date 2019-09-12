@@ -43,6 +43,8 @@ public class ShiroConfiguration {
         filterChainDefinitionMap.put("/css/**", "anon");
         filterChainDefinitionMap.put("/lay/**", "anon");
         filterChainDefinitionMap.put("/common/**", "anon");//addUser
+        //测试
+        filterChainDefinitionMap.put("/*/**", "anon");
         //主页
         filterChainDefinitionMap.put("/index", "anon");
         filterChainDefinitionMap.put("/html/*.html", "anon");

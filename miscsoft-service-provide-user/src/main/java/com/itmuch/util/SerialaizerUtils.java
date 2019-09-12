@@ -4,7 +4,7 @@ import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
-import com.itmuch.dto.NoteDTO;
+import com.cloud.dto.NoteDTO;
 
 public class SerialaizerUtils/* <T>*/ {
 	private static Schema<NoteDTO> schema = RuntimeSchema.createFrom(NoteDTO.class);

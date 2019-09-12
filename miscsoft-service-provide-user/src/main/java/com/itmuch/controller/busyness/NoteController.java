@@ -1,8 +1,14 @@
 package com.itmuch.controller.busyness;
 
-import java.util.List;
-import java.util.Map;
-
+import com.cloud.dto.NoteDTO;
+import com.cloud.model.Note;
+import com.cloud.model.NoteDetail;
+import com.cloud.util.JSONResult;
+import com.github.pagehelper.Page;
+import com.itmuch.controller.CoreController;
+import com.itmuch.model.Resource;
+import com.itmuch.service.FileUploadService;
+import com.itmuch.service.NoteService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
@@ -16,17 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.github.pagehelper.Page;
-import com.itmuch.controller.CoreController;
-import com.itmuch.dto.NoteDTO;
-import com.itmuch.exception.BizException;
-import com.itmuch.model.Note;
-import com.itmuch.model.NoteDetail;
-import com.itmuch.model.Resource;
-import com.itmuch.model.User;
-import com.itmuch.service.FileUploadService;
-import com.itmuch.service.NoteService;
-import com.itmuch.util.JSONResult;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/note/")

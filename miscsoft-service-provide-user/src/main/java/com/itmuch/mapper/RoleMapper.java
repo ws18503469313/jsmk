@@ -3,8 +3,8 @@ package com.itmuch.mapper;
 import java.util.List;
 import java.util.Set;
 
-import com.itmuch.dto.RoleAccessDTO;
-import com.itmuch.model.Role;
+import com.cloud.dto.RoleAccessDTO;
+import com.cloud.model.Role;
 import com.itmuch.util.MyMapper;
 
 public interface RoleMapper extends MyMapper<Role> {

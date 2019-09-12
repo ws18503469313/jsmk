@@ -2,9 +2,9 @@ package com.itmuch.mapper;
 
 import java.util.List;
 
-import com.itmuch.dto.UserDTO;
-import com.itmuch.dto.UserRoleDTO;
-import com.itmuch.model.User;
+import com.cloud.dto.UserDTO;
+import com.cloud.dto.UserRoleDTO;
+import com.cloud.model.User;
 import com.itmuch.util.MyMapper;
 
 public interface UserMapper extends MyMapper<User> {

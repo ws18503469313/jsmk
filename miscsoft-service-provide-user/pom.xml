@@ -27,8 +27,11 @@
     </properties>
 
     <dependencies>
-
-
+        <dependency>
+            <groupId>com.cloud</groupId>
+            <artifactId>common-code</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <!-- 热部署 -->
         <!-- devtools可以实现页面热部署（即页面修改后会立即生效， 这个可以直接在application.properties文件中配置spring.thymeleaf.cache=false来实现） -->
         <!-- 实现类文件热部署（类文件修改后不会立即生效），实现对属性文件的热部署。 -->
@@ -43,9 +46,12 @@
                 需要重新引入 -->
             <optional>true</optional>
         </dependency>
-        <!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-jpa</artifactId>
-            </dependency> -->
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -116,7 +122,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-redis</artifactId>
-            <version>RELEASE</version>
+            <version>1.4.7.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -124,10 +130,6 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
-        <!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-jpa</artifactId>
-            </dependency> -->
-        <!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-actuator</artifactId>
-            </dependency> -->
         <!-- =============================================================================================== -->
         <!-- 引入 freemarker 模板依赖 -->
         <dependency>
@@ -146,9 +148,6 @@
             <artifactId>thymeleaf-extras-shiro</artifactId>
             <version>2.0.0</version><!-- 没有用耶( •̀ ω •́ )y -->
         </dependency>
-        <!-- 使用自带的hika 代替 -->
-        <!-- <dependency> <groupId>com.alibaba</groupId> <artifactId>druid</artifactId>
-            <version>1.1.0</version> </dependency> -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -174,62 +173,11 @@
             <version>1.2.3</version>
         </dependency>
 
-        <!--<dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.9</version>
-        </dependency>-->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
-            <version>1.1</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>mail</artifactId>
-                    <groupId>javax.mail</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>27.0.1-jre</version>
-        </dependency>
-
-
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>1.4.3</version>
         </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-        </dependency>
-
 
         <!-- shiro -->
         <dependency>
@@ -253,16 +201,6 @@
             <version>1.3.2</version>
             <scope>compile</scope>
             <optional>true</optional>
-        </dependency>
-        <!-- json -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.1.28</version>
         </dependency>
 
         <dependency>
@@ -290,45 +228,27 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
         </dependency>
-        <!-- httpclient -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
+
         <!-- xml工具dom4j和XStrean -->
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>1.2.2</version>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.9.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.10.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.10-FINAL</version>
-        </dependency>
-        <!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-validator</artifactId>
-            <version>5.2.4.Final</version> <exclusions> <exclusion> <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId> </exclusion> </exclusions> </dependency> -->
     </dependencies>
+
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Camden.SR4</version>
+                <version>Finchley.BUILD-SNAPSHOT</version>
                 <type>pom</type>
-                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

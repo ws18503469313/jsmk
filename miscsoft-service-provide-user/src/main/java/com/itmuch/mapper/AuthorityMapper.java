@@ -2,7 +2,7 @@ package com.itmuch.mapper;
 
 import java.util.Collection;
 
-import com.itmuch.model.Authority;
+import com.cloud.model.Authority;
 import com.itmuch.util.MyMapper;
 
 public interface AuthorityMapper extends MyMapper<Authority> {

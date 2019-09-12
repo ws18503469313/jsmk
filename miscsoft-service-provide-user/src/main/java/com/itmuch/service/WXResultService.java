@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.itmuch.mapper.WXResultMapper;
-import com.itmuch.model.WXResult;
+import com.cloud.model.WXResult;
 
 @Service
 public class WXResultService {

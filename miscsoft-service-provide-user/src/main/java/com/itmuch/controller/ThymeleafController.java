@@ -5,7 +5,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.itmuch.model.User;
+import com.cloud.model.User;
 
 @Controller
 @RequestMapping("th")

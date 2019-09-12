@@ -19,17 +19,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.itmuch.dto.NoteDTO;
+import com.cloud.dto.NoteDTO;
 import com.itmuch.mapper.UserMapper;
-import com.itmuch.model.Categray;
+import com.cloud.model.Categray;
 import com.itmuch.model.Resource;
-import com.itmuch.model.User;
+import com.cloud.model.User;
 import com.itmuch.service.CategrayService;
 import com.itmuch.service.FileUploadService;
 import com.itmuch.service.ImageService;
 import com.itmuch.service.NoteService;
 import com.itmuch.service.UserService;
-import com.itmuch.util.JSONResult;
+import com.cloud.util.JSONResult;
 import com.itmuch.util.JedisUtil;
 import com.itmuch.util.WebParamUtils;
 

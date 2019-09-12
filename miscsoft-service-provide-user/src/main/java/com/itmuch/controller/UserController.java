@@ -1,8 +1,15 @@
 package com.itmuch.controller;
 
-import java.util.List;
-import java.util.Map;
-
+import com.cloud.model.Role;
+import com.cloud.model.User;
+import com.cloud.util.JSONResult;
+import com.github.pagehelper.PageHelper;
+import com.cloud.dto.UserDTO;
+import com.cloud.dto.UserRoleDTO;
+import com.itmuch.mapper.UserMapper;
+import com.itmuch.model.Resource;
+import com.itmuch.service.RoleService;
+import com.itmuch.service.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
@@ -13,16 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.github.pagehelper.PageHelper;
-import com.itmuch.dto.UserDTO;
-import com.itmuch.dto.UserRoleDTO;
-import com.itmuch.mapper.UserMapper;
-import com.itmuch.model.Resource;
-import com.itmuch.model.Role;
-import com.itmuch.model.User;
-import com.itmuch.service.RoleService;
-import com.itmuch.service.UserService;
-import com.itmuch.util.JSONResult;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller

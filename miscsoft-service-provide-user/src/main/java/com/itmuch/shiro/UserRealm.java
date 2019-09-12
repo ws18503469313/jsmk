@@ -24,7 +24,7 @@ import com.itmuch.mapper.AccessMapper;
 import com.itmuch.mapper.AuthorityMapper;
 import com.itmuch.mapper.RoleMapper;
 import com.itmuch.mapper.UserMapper;
-import com.itmuch.model.User;
+import com.cloud.model.User;
 
 /**
  * 用戶自定义实现Realm,完成客户的认证和授权

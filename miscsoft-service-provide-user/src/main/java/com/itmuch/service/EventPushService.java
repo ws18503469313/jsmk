@@ -1,5 +1,19 @@
 package com.itmuch.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.cloud.util.HttpClientUtil;
+import com.cloud.util.JsonUtils;
+import com.cloud.util.XMLUtils;
+import com.google.common.collect.Maps;
+import com.itmuch.Configuration.WXConfiguration;
+import com.itmuch.util.JedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,29 +22,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.itmuch.Configuration.WXConfiguration;
-import com.itmuch.model.wx.Content;
-import com.itmuch.model.wx.Data;
-import com.itmuch.model.wx.MessageConstant;
-import com.itmuch.model.wx.TemplateMessage;
-import com.itmuch.model.wx.WXTextMessage;
-import com.itmuch.util.HttpClientUtil;
-import com.itmuch.util.JedisUtil;
-import com.itmuch.util.JsonUtils;
-import com.itmuch.util.XMLUtils;
 
 @Service
 public class EventPushService {
@@ -49,17 +40,17 @@ public class EventPushService {
 //		TEMPALTE_URL = TEMPALTE_URL.replace("ACCESS_TOKEN", accessToken);
 //		log.info("o.o.o.o.o.O.ACCESS_TOKEN:"+accessToken+"------------------------");
 //		HttpClientUtil.doPostJson(TEMPALTE_URL, templateMessage(openIDs));
-		WXTextMessage message = XMLUtils.xmlToPojo(WXTextMessage.class, req);
+		com.cloud.model.wx.WXTextMessage message = XMLUtils.xmlToPojo(com.cloud.model.wx.WXTextMessage.class, req);
 //		Map<String, String> map = XMLUtils.xmltoMap(req);
-		WXTextMessage result = new WXTextMessage();
-		if(MessageConstant.REQ_MESSAGE_TYPE_TEXT.equals(message.getMsgType())) {
+		com.cloud.model.wx.WXTextMessage result = new com.cloud.model.wx.WXTextMessage();
+		if(com.cloud.model.wx.MessageConstant.REQ_MESSAGE_TYPE_TEXT.equals(message.getMsgType())) {
 			
 			result.setFromUserName(message.getToUserName());
 			result.setToUserName(message.getFromUserName());
 			result.setContent(tuLinAPI(message.getContent()));
 			result.setMsgId(message.getMsgId());
 			result.setCreateTime(String.valueOf(System.currentTimeMillis()/1000));
-			result.setMsgType(MessageConstant.REQ_MESSAGE_TYPE_TEXT);
+			result.setMsgType(com.cloud.model.wx.MessageConstant.REQ_MESSAGE_TYPE_TEXT);
 		}
 		log.info("o.o.o.o.O.return result:"+result.toString()+"-----------------------");
 		return XMLUtils.pojoToXML(result);
@@ -141,15 +132,15 @@ public class EventPushService {
 	 * 发送模板消息
 	 */
 	private String templateMessage(List<String> openIDs) {
-		Content first = new Content("first", "#FF0000");
-		Content keyword1 = new Content("keyword1", "#FF0000");
-		Content keyword2 = new Content("keyword2", "#FF0000");
-		Content keyword3 = new Content("keyword3", "#FF0000");
-		Content remark = new Content("remark", "#FF0000");
-		Data data = new Data(first, keyword1, keyword2, keyword3, remark);
+		com.cloud.model.wx.Content first = new com.cloud.model.wx.Content("first", "#FF0000");
+		com.cloud.model.wx.Content keyword1 = new com.cloud.model.wx.Content("keyword1", "#FF0000");
+		com.cloud.model.wx.Content keyword2 = new com.cloud.model.wx.Content("keyword2", "#FF0000");
+		com.cloud.model.wx.Content keyword3 = new com.cloud.model.wx.Content("keyword3", "#FF0000");
+		com.cloud.model.wx.Content remark = new com.cloud.model.wx.Content("remark", "#FF0000");
+		com.cloud.model.wx.Data data = new com.cloud.model.wx.Data(first, keyword1, keyword2, keyword3, remark);
 		
 		
-		TemplateMessage message = new TemplateMessage();
+		com.cloud.model.wx.TemplateMessage message = new com.cloud.model.wx.TemplateMessage();
 		message.setTemplateID(wxConfiguration.getTemplate());
 		message.setUserOpenID(openIDs.get(0));
 		message.setUrl("www.baidu.com");

@@ -1,19 +1,19 @@
 package com.itmuch.service;
 
-import java.util.List;
-
+import com.cloud.model.Role;
+import com.cloud.util.ArrayUtil;
+import com.cloud.dto.RoleAccessDTO;
+import com.itmuch.exception.BizException;
+import com.itmuch.mapper.AccessMapper;
+import com.itmuch.mapper.RoleMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.itmuch.dto.RoleAccessDTO;
-import com.itmuch.exception.BizException;
-import com.itmuch.mapper.AccessMapper;
-import com.itmuch.mapper.RoleMapper;
-import com.itmuch.model.Role;
-import com.itmuch.util.ArrayUtil;
+import java.util.List;
 @Service
 public class RoleService {
 	
@@ -64,5 +64,16 @@ public class RoleService {
 	 */
 	public List<Role> listAllRole(){
 		return roleMapper.selectAll();
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void doSth(Role role){
+		if(StringUtils.isBlank(role.getId())) {
+			String id = sid.nextShort();
+			role.setId(id);
+			roleMapper.insert(role);
+		}else {
+			roleMapper.updateByPrimaryKeySelective(role);
+		}
 	}
 }

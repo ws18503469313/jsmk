@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.itmuch.mapper.CategrayMapper;
-import com.itmuch.model.Categray;
+import com.cloud.model.Categray;
 import com.itmuch.model.Resource;
 import com.itmuch.service.CategrayService;
-import com.itmuch.util.JSONResult;
+import com.cloud.util.JSONResult;
 
 import tk.mybatis.mapper.entity.Example;
 

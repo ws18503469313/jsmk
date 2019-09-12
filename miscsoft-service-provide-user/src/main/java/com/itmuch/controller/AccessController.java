@@ -1,18 +1,13 @@
 package com.itmuch.controller;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.codec.Charsets;
+import com.alibaba.fastjson.JSONArray;
+import com.cloud.model.Access;
+import com.cloud.util.ExcelUtil;
+import com.cloud.util.JSONResult;
+import com.google.common.collect.Lists;
+import com.itmuch.mapper.AccessMapper;
+import com.itmuch.service.AccessService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Consts;
-import org.apache.http.entity.ContentType;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
@@ -22,14 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSONArray;
-import com.google.common.collect.Lists;
-import com.itmuch.mapper.AccessMapper;
-import com.itmuch.model.Access;
-import com.itmuch.service.AccessService;
-import com.itmuch.util.ExcelUtil;
-import com.itmuch.util.JSONResult;
-import org.thymeleaf.util.DateUtils;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Controller
 @RequestMapping("/access/")

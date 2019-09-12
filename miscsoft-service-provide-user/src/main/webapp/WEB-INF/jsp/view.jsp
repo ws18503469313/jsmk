@@ -50,7 +50,7 @@
 				<li>
 					<div>
 						<label>名字</label><a>${n.name }</a> <label>发布时间</label><a>${n.publishTime }</a>
-						<label><a onclick="like(this)" value="${n.id }"><i class="layui-icon layui-icon-star-fill"  style="color: red;font-size: 30px;"></i></a>${n.like }</label>
+						<label><a onclick="like(this)" value="${n.id }"><i class="layui-icon layui-icon-star-fill"  style="color: red;font-size: 30px;"></i></a>${n.liked }</label>
 						<a href="${ctx }/index/detail?id=${n.id }" target="_blank">查看详情</a>
 					</div>
 				</li>

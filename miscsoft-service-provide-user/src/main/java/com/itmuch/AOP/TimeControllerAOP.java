@@ -1,6 +1,6 @@
 package com.itmuch.AOP;
 
-import com.itmuch.model.User;
+import com.cloud.model.User;
 import com.itmuch.util.MyWebUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -32,13 +32,13 @@ public class TimeControllerAOP  {
         User user = (User)MyWebUtils.getCurrentRequest().getSession().getAttribute("user");
         String username = user == null ? " " : "["+user.getUsername()+"]";
         Object obj = joinPoint.proceed();
-//        if (System.currentTimeMillis() - start > 100) {//响应时间过长的访问进行日志记录
+        if (System.currentTimeMillis() - start > 500) {//响应时间过长的访问进行日志记录
 	        if (logger.isInfoEnabled()) {
 	            logger.info(username + "O.O.O.O.O...took "+(System.currentTimeMillis() - start)
                             + "ms to process " + joinPoint.getTarget().getClass().getTypeName()
                             + "." + joinPoint.getSignature().getName() + "()");
 	        }
-//        }
+        }
         return obj;
     }
     

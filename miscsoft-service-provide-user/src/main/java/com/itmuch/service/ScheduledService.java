@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
-import com.itmuch.dto.NoteDTO;
+import com.cloud.dto.NoteDTO;
 import com.itmuch.mapper.NoteMapper;
-import com.itmuch.model.Note;
+import com.cloud.model.Note;
 import com.itmuch.util.JedisUtil;
 import com.itmuch.util.SerialaizerUtils;
 

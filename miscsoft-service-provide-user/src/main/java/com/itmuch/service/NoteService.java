@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cloud.model.Collect;
+import com.cloud.model.Note;
+import com.cloud.model.NoteDetail;
+import com.cloud.model.User;
+import com.itmuch.model.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
@@ -19,16 +24,11 @@ import com.github.pagehelper.PageHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.itmuch.dto.NoteDTO;
+import com.cloud.dto.NoteDTO;
 import com.itmuch.exception.BizException;
 import com.itmuch.mapper.CollectionMapper;
 import com.itmuch.mapper.NoteDetailMapper;
 import com.itmuch.mapper.NoteMapper;
-import com.itmuch.model.Collect;
-import com.itmuch.model.Note;
-import com.itmuch.model.NoteDetail;
-import com.itmuch.model.Resource;
-import com.itmuch.model.User;
 import com.itmuch.util.JedisUtil;
 import com.itmuch.util.SerialaizerUtils;
 
@@ -152,6 +152,17 @@ public class NoteService {
 		Collect collect = new Collect(sid.nextShort(), user.getId(), id);
 		collectionMapper.insert(collect);
 		return "操作成功";
+	}
+
+
+	public void test(){
+		Page<Note> obj =  PageHelper.startPage(1,1);
+		Example example = new Example(Note.class);
+		Example.Criteria criteria = example.createCriteria();
+		Note one = noteMapper.selectOneByExample(example);
+		one.setVisitNum(one.getVisitNum() + 1);
+		noteMapper.updateByPrimaryKeySelective(one);//更新数据库中的访问量
+//		result.get(0).setVisitNum();
 	}
 
 }

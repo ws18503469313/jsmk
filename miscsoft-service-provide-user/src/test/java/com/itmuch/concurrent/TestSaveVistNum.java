@@ -1,19 +1,10 @@
 package com.itmuch.concurrent;
 
-import java.util.Iterator;
-import java.util.Set;
-
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-
-import com.google.gson.Gson;
 import com.itmuch.BaseTests;
-import com.itmuch.dto.NoteDTO;
 import com.itmuch.mapper.NoteMapper;
-import com.itmuch.model.Note;
 import com.itmuch.service.NoteService;
 import com.itmuch.util.JedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestSaveVistNum extends BaseTests{
 

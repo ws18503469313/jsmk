@@ -14,10 +14,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.itmuch.dto.UserRoleDTO;
+import com.cloud.dto.UserRoleDTO;
 import com.itmuch.exception.BizException;
 import com.itmuch.mapper.UserMapper;
-import com.itmuch.model.User;
+import com.cloud.model.User;
 
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.entity.Example.Criteria;

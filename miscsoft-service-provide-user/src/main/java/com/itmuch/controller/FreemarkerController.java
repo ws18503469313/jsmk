@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itmuch.model.Resource;
-import com.itmuch.util.JSONResult;
+import com.cloud.util.JSONResult;
 import com.itmuch.util.JedisUtil;
 
 import redis.clients.jedis.JedisPool;

@@ -1,23 +1,19 @@
 package com.itmuch.controller.wx;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.cloud.dto.LocationDTO;
+import com.cloud.model.User;
+import com.cloud.model.WXResult;
+import com.cloud.util.CheckUtils;
+import com.cloud.util.HttpClientUtil;
+import com.cloud.util.JSONResult;
+import com.cloud.util.JsonUtils;
+import com.google.common.collect.Maps;
 import com.itmuch.cache.RedisCache;
-import com.itmuch.dto.LocationDTO;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.crypto.hash.Md5Hash;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.subject.Subject;
-import org.apache.tomcat.util.security.MD5Encoder;
+import com.itmuch.controller.BaseController;
+import com.itmuch.service.EventPushService;
+import com.itmuch.service.UserService;
+import com.itmuch.service.WXResultService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +24,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.Maps;
-import com.itmuch.controller.BaseController;
-import com.itmuch.model.User;
-import com.itmuch.model.WXResult;
-import com.itmuch.service.EventPushService;
-import com.itmuch.service.UserService;
-import com.itmuch.service.WXResultService;
-import com.itmuch.util.CheckUtils;
-import com.itmuch.util.HttpClientUtil;
-import com.itmuch.util.JSONResult;
-import com.itmuch.util.JsonUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value= {"/wx"})
