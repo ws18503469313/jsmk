@@ -66,7 +66,8 @@ public class TestController {
         return JSONResult.ok();
     }
     @RequestMapping("/findById/{id}")
-    public User findById(@PathVariable String id) {
+    public User findById(@PathVariable String id)  throws Exception {
+        log.info("getbyid=--------------------------{}", id);
         return userMapper.selectByPrimaryKey(id);
 
     }
