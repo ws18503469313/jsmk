@@ -7,6 +7,7 @@ import com.cloud.model.User;
 import com.itmuch.service.NoteService;
 import com.itmuch.service.RoleService;
 import com.cloud.util.JSONResult;
+import com.itmuch.util.ImageUtils;
 import org.n3r.idworker.Sid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 
 @RestController
 @RequestMapping("/test")
@@ -71,4 +77,18 @@ public class TestController {
         return userMapper.selectByPrimaryKey(id);
 
     }
+    @RequestMapping("/framework")
+    public void getFramework(HttpServletResponse resp)  throws Exception {
+        String filename = "framework.png";
+        ImageUtils.writeImage(resp, filename);
+
+    }
+
+
+//    @RequestMapping("/framework")
+    public void get(HttpServletResponse resp)  throws Exception {
+
+
+    }
+
 }
