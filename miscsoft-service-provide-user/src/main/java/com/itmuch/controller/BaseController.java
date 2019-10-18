@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.cloud.util.HttpClientUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,7 @@ public class BaseController extends CoreController{
 	 * @return
 	 */
 	@RequestMapping(value="index")
+	@RequiresAuthentication
 	public String index(Map<String, Object> map) {
 		JSONArray tree = accessService.getSysAccessTree(getCurrentUser().getId(), null);
 		map.put("tag", tree);

@@ -31,17 +31,34 @@ public class CustomerExceptionHandler {
 	public Object errorHandler(HttpServletRequest reqest, HttpServletResponse response, Exception e) throws Exception {
 //		e.printStackTrace();
 		log.error("error_message---------------------" + e.getMessage());
-		if (MyWebUtils.isAjax(reqest)) {
-
-			JSONObject json = new JSONObject();
-        	json.put("success", false);
-        	json.put("msg", e.getMessage());
-        	json.put("status", 300);
-    		json.put("message", e.getMessage());
-    		response.setContentType("application/json; charset=UTF-8");
-    		response.getWriter().print(json.toJSONString());
-    		return null;
-		} else {
+//		if (MyWebUtils.isAjax(reqest)) {
+//
+//			JSONObject json = new JSONObject();
+//        	json.put("success", false);
+//        	json.put("msg", e.getMessage());
+//        	json.put("status", 300);
+//    		json.put("message", e.getMessage());
+//    		response.setContentType("application/json; charset=UTF-8");
+//    		response.getWriter().print(json.toJSONString());
+//		} else {
+//			ModelAndView mav = new ModelAndView();
+//			mav.addObject("exception", e);
+//			mav.addObject("url", reqest.getRequestURL());
+//			mav.setViewName(IMOOC_ERROR_VIEW);
+//			return mav;
+//		}
+		try{
+			if (MyWebUtils.isAjax(reqest)) {
+				JSONObject json = new JSONObject();
+				json.put("success", false);
+				json.put("msg", e.getMessage());
+				json.put("status", 300);
+				json.put("message", e.getMessage());
+				response.setContentType("application/json; charset=UTF-8");
+				response.getWriter().print(json.toJSONString());
+			}
+			return null;
+		}catch(Exception ex){
 			ModelAndView mav = new ModelAndView();
 			mav.addObject("exception", e);
 			mav.addObject("url", reqest.getRequestURL());
