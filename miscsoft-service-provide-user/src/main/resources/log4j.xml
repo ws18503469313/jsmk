@@ -15,7 +15,7 @@
 
 	<appender name="Daily_File"
 		class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="/logs/userservice.log" />
+		<param name="file" value="/Users/dxm/doc/userservice.log" />
 		<param name="datePattern" value="'.'yyyy-MM-dd" />
 		<param name="append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
