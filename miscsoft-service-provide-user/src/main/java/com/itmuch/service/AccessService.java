@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
@@ -246,7 +248,7 @@ public class AccessService {
 	 *  二级菜单:删除二级菜单的role--access关系,最后删除该二级菜单
 	 * @param name
 	 */
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public String deleteAccess(String name) {
 		if(StringUtils.isBlank(name)) {
 			throw new BizException("请选择正确的权限");

@@ -51,14 +51,14 @@ public class ZJExcel {
     public static void main(String args[]) throws Exception{
         //处理客户信息
         String customer = "d:/客户BOM.xlsx";
-        Workbook customerBook = getWorkbook(customer);
+        Workbook customerBook = ExcelUtils.getWorkbook(customer);
         List<String> customerValue = getCustomerValue(customerBook);
         LinkedHashMap processedCustomerValue = processCustomerValue(customerValue);
 //        System.out.println(JSON.toJSONString(processedCustomerValue));
         //处理公司信息
 
         String company = "d:/★尼得科商用SUB ASSY 1HP POOL PUMP WW MOTOR CONTROL主控板OEM--HGWN-373DA(高银).xlsx";
-        Workbook companyBook = getWorkbook(company);
+        Workbook companyBook = ExcelUtils.getWorkbook(company);
         List<CompanyInfo> companyInfos = resolveCompanyValue(companyBook);
 //        System.out.println(JSON.toJSONString(companyInfos));
         List<CompanyInfo> infos = sort(processedCustomerValue, companyInfos);
@@ -76,17 +76,7 @@ public class ZJExcel {
 
     }
 
-    private static Workbook getWorkbook(String name) throws Exception {
-        FileInputStream in = new FileInputStream(new File(name));
-        Workbook workbook = null;
-        if (name.endsWith("xls")) {
-            workbook = new HSSFWorkbook(in);
-        }
-        if (name.endsWith("xlsx")) {
-            workbook = new XSSFWorkbook(OPCPackage.open(in));
-        }
-        return workbook;
-    }
+
 
     private static List getCustomerValue(Workbook workbook){
 
