@@ -18,6 +18,8 @@
 /.mvn/
 
 ### IntelliJ IDEA ###
+/common/.idea/
+common/.idea/
 .idea
 *.iws
 *.iml

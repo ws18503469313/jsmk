@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cloud.util.HttpClientUtil;
 import com.cloud.util.JsonUtils;
-import com.cloud.util.XMLUtils;
+import com.cloud.util.xmlreader.XMLUtils;
 import com.google.common.collect.Maps;
 import com.itmuch.Configuration.WXConfiguration;
 import com.itmuch.util.JedisUtil;
