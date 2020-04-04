@@ -102,7 +102,6 @@ public class UserRealm extends AuthorizingRealm{
 		}
 		
 		Md5Hash hash = new Md5Hash(token.getPassword(),username);
-		log.info("----------------------------------token.hash-"+hash+"-----------------");
 		if(!user.getPassword().equals(hash.toString())) {
 			throw new IncorrectCredentialsException("wrong password");
 		}

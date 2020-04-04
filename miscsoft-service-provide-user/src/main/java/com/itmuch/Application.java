@@ -1,14 +1,17 @@
 package com.itmuch;
 
+import com.itmuch.util.RedisCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import redis.clients.jedis.JedisCluster;
 import tk.mybatis.spring.annotation.MapperScan;
 
 @SpringBootApplication
@@ -27,8 +30,11 @@ public class Application extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 //		long start = System.currentTimeMillis();
-		SpringApplication.run(Application.class, args);
+		ConfigurableApplicationContext app = SpringApplication.run(Application.class, args);
 //		log.info("started, took o.o.o.o.o.O" + (System.currentTimeMillis() - start) + "ms");
+		JedisCluster cluster = app.getBean(JedisCluster.class);
+		System.out.println(cluster.set("hello", "jedis-cluster"));
+		System.out.println(cluster.get("hello"));;
 	}
 
 	// @Bean
