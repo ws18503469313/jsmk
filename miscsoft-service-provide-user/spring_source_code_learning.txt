@@ -1,0 +1,1211 @@
+Day_2019_12_18
+一.准备工作: XmlBeanDefinitionReader 来完成
+	1.xml 的 解析(detecte: 检查,解析,校验)
+		a.通过factory 读取 xml
+		EntityResolver 作用? 帮助spring着找到解析xml的模板,
+
+			spring 借助 org.apache.xerces 传入 spring自己实现的 PluggableSchemaResolver-->EntityResolver, 
+			然后 xerces 通过类成员 resolveEntity 来调用 spring自己实现的resolveEntity(String publicId, String systemId)方法.
+		b.怎么选取解析模板?
+			spring 根据 systemId 以什么来结尾来确认用什么 entityResolver 来解析xml, 
+			xml 的解析模式, 不是 dtd ,就是 xsd .默认 xsd;
+			DelegatingEntityResolver (delegating: 委派,选举,授权) 通过加载 META-INF/spring.schemas 这个propertits ,通过systemid 来获取 模板文件位置(项目相对路径)
+		c.创建什么样的entityResolver ?
+			xmlBeanFactory 来说, 它自己的 xmlBeanDefinitionReader 的resourceLoader 是 PathMatchingResourcePatternResolver, 
+			不为null, 所以创建的 entityResolver 是 ResourceEntityResolver extends DelegatingEntityResolver
+		
+
+
+		DocumentBuilderFactory factory (com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl) 
+	 
+	 2.org.apache.xerces 解析 xml 返回 DeferredDocumentImpl --> Document			
+		
+
+二.解析xml:	doRegisterBeanDefinitions(Element root), DefaultBeanDefinitionDocumentReader来完成
+	1.从 xml 的root 节点中 中读取配置的默认属性, 
+		default-lazy-init="false"
+        default-merge="false"
+        default-autowire="no"
+        default-autowire-candidates=""
+        ...
+    2.if (this.delegate.isDefaultNamespace(root)) {
+    检查xml文件中是否含有 http://www.springframework.org/schema/beans
+    	检擦 profile 
+    		有则检查 enviment 中是否 actived, 否则不浪费性能去解析
+    		获取所有的子节点,空行不解析
+    		...
+	3.else
+		执行装配前置处里, 装配, 后置处理, 前后置留给用户实现, --> 模板方法模式
+
+	4.parseBeanDefinitions(root, this.delegate); 开始表演:
+	
+		遍历所有子节点:
+			如果是Element 类型的,(去除xml空行)
+			则根据 namespaceUri 来操作:
+			a.如果是默认是 namespace: (创建一个beandefinationholder holder 包含 genericBeanDefinition)
+				parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate)
+				
+				1.对 <import /> 标签 进行解析 
+					
+				2.对 alias 标签进行解析
+				3.对 bean 标签进行解析
+						a.获取 id, name 属性
+						b.获取className, parent, 根据这两个属性来创建 bean(GenericBeanDefinition) 
+						c.解析属性--parseBeanDefinitionAttributes(Element ele, String beanName,BeanDefinition containingBean, AbstractBeanDefinition bd),
+							singleton, scope, abstract, lazy-init, autowire, dependency-check,depends-on, factory-method, destroy-method,init-method ....属性
+						d.给 bean 设置 description 
+						e.解析 该节点下的 子节点
+							parse 自定义属性 meat-data
+							parse look-up 节点
+							parse replace-method 节点
+							parse 自定义构造器
+									自定义构造器,含 type, name, index 三个属性, 解析出来的属性 保存在 ConstructorArgumentValues.ValueHolder --> LinkedHashMap 里
+							parse property 属性
+							parse Qualifier 属性
+						f.解析 bean 标签下的自定义标签 进行解析
+							decorateBeanDefinitionIfRequired(root, holder)
+						g.注册
+						h.发布注册事件
+				4.对 beans 标签进行解析
+			b. 装饰 自定义节点:
+				1.自定义标签的实现:(另建 附1)
+					namespaceuri: http://www.springframework.org/schema/aop --> 从handlermapping中 获取org.springframework.aop.config.AopNamespaceHandler
+
+				2.delegate.parseCustomElement(root): 
+					a.获取自定义 handler CustomerNamespaceHandler --> NamespaceHandlerSupport --> NamespaceHandler
+						使用 NamespaceHandlerResoulver 通过 namespaceUri 来动态(从 handlerMappings 中获取 handler的全类名,如果没有根据类名生成一个handler),
+					  接着执行 handler 的init()方法,并把handler 缓存到 handlerMappings
+						handler.parase
+					b.通过handler 找到解析器 paraser
+						paraser.parase
+						parseInternal() --执行自定义解析器重写的方法构建 genericBeanDefinition
+					c.解析 id, 	alias, 
+					d.注册
+					e.发布注册事件
+三. 实例化bean
+	HelloBean bean = (HelloBean)bf.getBean("helloBean");
+	1.转换 beanName
+		如果是factoryBean 需要去掉 '&'
+		如果是alias, 需要找到真正的beanName
+		在某些情况下,bean的实例化过程比较复杂,需要在<bean> 标签中做大量配置,因此用户可实现beanFactory来定制实例化bean的逻辑
+		FactoryBean的使用,
+			car 实现 FactoryBean,传入Car泛型, 调用getBean("car")的时候, spring通过反射发现该bean实现了beanFactory接口, 会调用getBean("&car");
+	2.尝试从缓存中加载单例 singletonObjects 
+		如果不是 FactoryBean则直接返回, 否则需要调用实例化 FactoryBean代表的bean
+		"*****避免循环依赖******":		
+		spring 创建bean的原则是不等bean创建完成就会将创建的bean的ObjectFactory提早曝光到缓存中一旦下一个bean创建的时候需要依赖上一个bean, 则直接使用 ObjectFactory
+		getSingleton(beanName, true); true-->表示允许早期依赖,singleton 模式
+		singletonObjects: 用于保存beanName 和 bean 实例的工厂之间的关系 beanName --> beanInstance
+		singletonFactorys: 用于保存beanName 和 创建bean工厂之间的关系 beanName -- > ObjectFactory
+		earlySingletonObjects: 用于保存beanName 和 bean 实例的工厂之间的关系, 不同于 singletonObjects的是当一个单例方到这里后, bean还在创建过程中,就可以通过
+							getBean方法获取到,用于检测循环引用
+
+		先在全局缓存变量(singletonObjects)中获取,如果没有,则锁定全局缓存变量,进行处理:
+				如果该bean正在加载(earlySingletonObjects),则不处理,否则 从 singletonFactories 中获取,存放到 earlySingletonObjects 中,
+				earlySingletonObjects 和  从singletonFactories 互斥
+		"*******循环依赖的解决******" :
+		1.构造器循环依赖:
+			throws Exception
+		2.setter循环依赖
+			提前暴露beanFactory
+
+		3.prototype范围内的依赖处理
+			此类型的bean,不进行缓存,因此无法暴露一个创建中的bean
+	3.bean的实例化earlySingletonObjects
+		a.如果从缓存中得到了bean的原始状态,则需要对bean进行实例化(缓存中记录的只是最原始的bean的状态,不一定是最终需要的bean, 可能是 FactoryBean)
+
+			AbstractBeanFactory --> FactoryBeanRegistrySupport --> DefaultSingletonBeanRegistry
+			如果从缓存中获取到了 beanInstance
+				getObjectForBeanInstance()
+				判断是否是FactoryBean 如果不是则直接返回,否则继续处理:
+					getMergedLocalBeanDefinition() 将 解析出来的xml genericBeanDefinition -- > rootBeanDefinition, 这时候会有一个 synthetic 属性,来标识是否为合成的bean,
+				还是员工定义的bean
+				如果是单例模式, 则从缓存(factoryBeanObjectCache)中获取,没有则创建, 调用doGetObjectFromFactoryBean() 方法中的 factory.getObject(), 返回真正的bean,
+				如果是用户自定义bean 的话,调用用户自定义的postProcessObjectFromFactoryBean() 后置处理器. 并放入缓存中
+		b.否则从头开始加载bean:
+			先标记 bean 正在创建
+			创建 依赖的bean
+			再根据 bean 的模式(单例/prototype/customer) 来创建bean
+			spring 重载了 getSingleton(beanName, beanFactory)
+				1.检查缓存是否加载过
+				2.若缓存张没有,则标记该bean正在加载状态, 用来检测循环依赖
+				3.执行传入的 beanFactory 的 getObject() 方法 --> createBean()
+					1.设置class属性
+					2.对 override(lookup-method, replace-method) 方法进行验证及准备覆盖的方法.
+					3.给 beanpostprocessor 一个机会来返回代理 bean
+						实例化bean前调用,将AbstractBeanDefinition -- > BeanWrapper
+					4.doCreateBean()
+						1.清除缓存
+						2.实例化bean, 将 RootBeanDefinition 转换为 BeanWrapper
+							a.如果存在工厂方法,即配置了factory-methord,则使用工厂方法进行初始化.
+							b.解析构造函数并进行构造函数的实例化.
+								因为解析过程是个比较消耗性能的过程,所以采用缓存机制,先去resolvedConstructorOrFactoryMethod中获取,如果没有再去解析.
+								(1.)autowireConstructor==========
+									通过配置文件配置的参数个数和类型,找出对应的构造器 constructorToUse & argsHolderToUse 同过反射来构造一个bean实例
+									如过有传入的参数,则使用传入的参数,否则使用配置文件解析出来的参数来找到对应的constructor
+									*.如果存在method-ovrride 则 使用 CglibSubclassingInstantiationStrategy 来 覆盖 || 动态替换方法
+									*.否则直接运用解析好的构造器通过反射来构造一个实例
+									最后通过beanWrapper来包装返回beanInstance
+								(2.)instantiateBean=========
+									直接找到无参构造器,实例化一个空bean
+									最后通过beanWrapper来包装返回beanInstance
+
+						3.MergedBeanDefinitionPostProcessor 的使用,bean 合并后的处理, autowire 注解再这个时候实现预解析
+						4.依赖处理,提前暴露 ObjectFactory 再通过 SmartInstantiationAwareBeanPostProcessor 动态实现 "**aop**"
+						5.属性填充 populateBean(),
+							根据解析好的properties 来填充属性, 首先如果有 InstantiationAwareBeanPostProcessor, 来控制是否进行属性填充
+							如果设置了 属性注入的方式: byName / byType 会按照相应的方式来注入属性
+						 initializeBean 的使用. 
+						 	*.激活实现的 aware 接口
+						 	*.applyBeanPostProcessorsBeforeInitialization()
+						 	*.init-method 的激活, 
+						6.循环依赖检查
+						7.注册DisposableBean, destroy-method 的注册
+							用户还可以 注册后处理器 DestructionAwareBeanPostProcessor 来实现统一处理注销手段
+
+				4.移除正在创建的标记
+				5.缓存 bean 的各种辅助状态(singletonObjects, singletonFactories, earlySingletonObjects, registeredSingletons)
+				6.返回结果
+
+			
+
+	4.原型模式的依赖检查
+		只有在单例模式下才会尝试解决循环依赖
+	5.检测 parentBeanFatorty
+
+	6.将解析出来的 GenericBeanDefinition 转换为 RootBeanDefinition,转换的时候如果父类bean不为空,则会一并合并父类的属性
+
+	7.寻找依赖
+		创建依赖的bean
+	8.针对不同的scope创建bean
+	9.类型转换
+
+四.容器的扩展 ApplicationContext 实例化的bean 是存储在 beanDefinitionMap 中的
+	*.解析传入的配置文件----可以是数组形式的
+	*.refresh()
+		1.初始化前的准备工作, 对系统属性或环境变量进行准备及验证
+			prepareRefresh()
+			可以继承 ClassPathXmlApplicationContext 重新 initPropertySources()方法, 对源码进行扩展,添加个性化要求 validateRequiredProperties验证的时候如果检测到没有自定义的要求, 则会抛出 MissingRequiredPropertiesException 异常
+
+		2.初始化 beanFactory, 读取XML
+			和 xmlBeanFactory 类似,
+			a.创建DefaultListableBeanFactory
+			b.指定给factory 设置id, weakReffrence
+			c.定制化, 通过子类覆盖 customizeBeanFactory()方法 beanFactory, allowBeanDefinitionOverriding(允许覆盖同名称的不同定义对象), allowCircularReferences(允许bean之间的循环依赖) 的配置
+			d.加载 BeanDefinition
+				初始化 xmlBeanDefinitionReader
+				然后根据传入的配置 循环解析 xml,
+
+		3.beanFactory 的获取(factory的集成),以及各种功能(aop,tx)填充
+			增肌对于 Spel 的支持 对 #{} 进行填充
+			增加属性注册编辑器:
+				Date 类型的属性, 如果没有对应的解析器,则会报 无法将String --> Date 的 Exception
+				解决方案一: 见附四 
+					spring 在注入属性时,会自动调用自定义的DatePeopertyEditor进行解析,并根据结果进行解析
+				解决方案二:  见附五
+					spring中用于封装bean的是BeanWrapper, 而它头间接继承了PropertyEditorRigstry,它的默认实现的beanWrapplerImpl还继承了PropertyEditorRegistrySupport,它的createDefaultEditors()中,注册了一系列的属性编辑器
+				解决方案三:  见附九
+
+			添加 ApplicationContextAwareProcessor, 在调用init-method的时候,会激活各种aware接口, 来封装资源
+
+			@Qualifier @Autowire 注解的支持
+			设置可以使用 ${}  的形式来调用相关属性
+			忽略自动装配的接口
+			aspectJ 的支持,
+			添加几个默认系统环境的 bean (env, properties)
+
+		4.子类覆盖方法的额外处理
+			properties 文件的引入
+			${} 符号的填充 见 附六
+		5.激活BeanFactory的处理器, 
+			主要对两种类型的 处理器  --> BeanFactoryPostProcessor 中的接口进行调用
+			他们保存在 beanFactoryPostProcessors 中
+			而处理过程主要用到两个 list:
+				regularPostProcessors -- 一般类型的BeanFactoryPostProcessor
+				registryPostProcessors -- BeanDefinitionRegistryPostProcessor
+			如果用户实现了 PriorityOrdered 接口, 还会对这些实现类进行排序,但是spring 内部硬编码的处理器没有进行排序
+
+		6.注册拦截bean创建的bean处理器
+			beanFactory 没有实现后置处理器的自动注册,所以相比 applicationcontext 来说, 扩展性 不高
+			添加 BeanPostProcessorChecker beanpostprocessor 的处理器, 对 beanpostprocessor 来进行监控
+			applicationcontext 会按照  PriorityOrdered > Ordered > NoOrdered 的顺序来实例化各种 beanpostprocessor, 然后进行注册
+			添加 ApplicationListenerDetector 处理器
+		7.为上下文初始化message源,对不同的消息体进行国际化处理
+			如果用户配置了 "messageSource" 则使用 HierarchicalMessageSource, 见附七;
+			否则使用默认的 DelegatingMessageSource
+
+		8.初始化应用消息广播器(multicaster), 并放入"applicationEventMulicaster" bean中
+			如果用户配置了 "applicationEventMulticaster", 则使用用户自定义的事件广播器, 
+			可以给广播器配置 executor 来使事件异步化, 还可以配置 errorhandler 来统一处理事件处理器中抛出的异常见附八:
+			否则使用默认的 SimpleApplicationEventMulticaster,
+			如果一个事件 有多个监听器, 则可以给监听器添加 @Order(value = x) 的注解 来控制监听器的执行顺序
+		9.留给子类来初始化bean
+		10.在所有注册的bean中查找listenerbean, 注册到消息广播器中
+		11.初始化剩下的 non-lazy singleton bean
+			然后冻结配置,所有注册的bean 将不被修改或进行任何进一步的处理
+			提前初始化所有 单例 非 lazy-init 的bean,
+		12.完成刷新过程,通知生命周期处理器 lifecycleProcessor 刷新过程,同时发出ContextRefreshEvent通知别人
+			spring 提供了lifeCycle接口, 包含start/stop 方法, 在spring 启动/关闭的时候进行调用.通常用来配置后台程序(如对MQ进行轮询), 默认使用DefaultLifecycleProcessor, 见附十
+附十一:	beanPostProcessor的执行顺序:
+	InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation()
+	InstantiationAwareBeanPostProcessor.postProcessAfterInstantiation()
+	MergedBeanDefinitionPostProcessor.postProcessMergedBeanDefinition()
+	InstantiationAwareBeanPostProcessor.postProcessPropertyValues()//依赖注入
+	invokeAwareMethods()
+	BeanProcessor.postProcessBeforeInitialization()
+	afterPropertiesSet()
+	invokeCustomInitMethod()
+	BeanProcessor.postProcessAfterInitialization()
+五:AOP
+	注解模式:
+		在xml 中开启 aop,
+		 解析的时候通过 namespace 会注册 parser, parser解析的时候会 注册 internalAutoProxyCreator(其实是AnnotationAwareAspectJAutoProxyCreator) BeanDefinition,
+		 然后把applicationContext 会把 这些postprocessor 管理起来,
+		 生成其他bean的时候,会调用 各种postProcessor 的 前后置方法
+	1.开启 aop:
+		<aop:aspectj-autoproxy />
+		aop 自定义注解的支持:	AopNamespaceHandler
+			@Override
+			public void init() {
+			// In 2.0 XSD as well as in 2.1 XSD.
+				registerBeanDefinitionParser("config", new ConfigBeanDefinitionParser());
+				registerBeanDefinitionParser("aspectj-autoproxy", new AspectJAutoProxyBeanDefinitionParser());// 有关aop的配置
+				registerBeanDefinitionDecorator("scoped-proxy", new ScopedProxyBeanDefinitionDecorator());
+				// Only in 2.0 XSD: moved to context namespace as of 2.1
+				registerBeanDefinitionParser("spring-configured", new SpringConfiguredBeanDefinitionParser());
+			}
+			AspectJAutoProxyBeanDefinitionParser: doParse():
+				1.注册 AnnotationAwareAspectJAutoProxyCreator (但是注册的 beanName 是 internalAutoProxyCreator, 在applicationContext refresh 的时候, 会注册 beanpostprocessor). 它基本上完成了aop, 根据@Point 注解定义的切点来自动代理相匹配的bean
+				2.处理 proxy-target-class 以及 expose-proxy
+					proxy-target-class: spring AOP 部分使用jdk动态代理或者cglib来为目标对象创建代理
+					强制使用cglib:
+						<aop:config proxy-target-class="true"/>
+					设置cglib和@aspectj自动代理支持:
+					expose-proxy: 如果代理对象发生内部调用, 则无法支持事务,
+						需要配置 expose-proxy="true"
+						然后内部调用 改为: ((HelloBean)AopContext.currentProxy()).doSth("params", 2);
+				3.在生成bean 前, resolveBeforeInstantiation(),注册所有增强器, ApplicationContext.postProcessBeanFactory()
+					调用 AnnotationAwareAspectJAutoProxyCreator 的postProcessBeforeInstantiation()方法,
+					在所有注册的bean中查找 是aspect 的bean, 即带有@aspect 注解的bean, 然后通过反射循环,找到它的及他父类的所有aop方法及属性
+					  (advisor), 根据注解生成不同的 AbstractAspectJAdvice(六种实现类 befor after around  return throw pointcut)增强器, 封装到 InstantiationModelAwarePointcutAdvisorImpl 中,  并记录在缓存中.
+			  	4.在 bean init-method() 的时候, AnnotationAwareAspectJAutoProxyCreator.postProcessAfterInitialization() 寻找合适的增强器 wrapIfNecessary(),
+			  		先查到合适的 advisor,并排序,
+			  			1.找到所有的 Advisor.class 的 bean
+			  			2.找到所有 使用 @Aspect 的bean, 在其及其父类中找到 @PointCut 注解方法, 封装为advisor
+		  			判断是否该进行增强
+	  					canApply
+
+			  		添加代理接口
+			  		设置要代理的类
+			  		委托给 ProxyFactory (ReflectiveAspectJAdvisorFactory) 来进行代理
+			  		1. 根据传如的对象创建代理 ObjenesisCglibAopProxy(config)判断条件:
+			  			config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)
+				  			config.isOptimize(): Return whether proxies should perform aggressive optimizations
+				  				控制CGLIB创建的代理是否使用寂静的优化策略
+				  			config.isProxyTargetClass(): Return whether to proxy the target class directly as well as any interfaces
+				  				目标类本身被代理,而不是接口
+				  			hasNoUserSuppliedProxyInterfaces(config): Determine whether the supplied {@link AdvisedSupport} has only the{@link org.springframework.aop.SpringProxy} interface specified(or no proxy interfaces specified at all).
+				  				是否存在代理接口
+		  					jdk diff cglib  
+		  						jdk只能针对接口 而cglib 针对目标类生成子类
+					2.获取代理
+						jdk 动态代理: 见附十二
+							获取当前 拦截器链,如果没有则调用切点方法. 并封装到 ReflectiveMethodInvocation 中
+							匹配规则,递归执行拦截器链
+						CGLIB 动态代理: 见附十三,
+							cglib 底层通过一个小而快的字节码处理框架 ASM, 来转换字节码并生成新的类
+							spring 	获取bean 的时候	bean 在初始化完成之后, 执行 beanpostprocessor(AnnotationAwareAspectJAutoProxyCreator), 通过 ProxyFactory 来创建代理,	通过代理(CglibAopProxy)来 将 advised 封装到 拦截器链(DynamicAdvisedInterceptor) 中,将 连接器链封装到 callBack中, 返回目标,在调用代理时直接激活拦截器中的 interceptor 方法,来实现增强
+
+六.spring-jdbc java database connectivity
+	<一.> spring-jdbc-template
+		Ⅰ.update
+			1.使用 SimplePreparedStatementCreator 来封装 参数和参数类型, 然后再用 SimplePreparedStatementCreator 来封装 sql  和 参数体
+			2. execute(psc, new PreparedStatementCallback<Integer>()) PreparedStatementCreator作为统一的数据库操作, 将个性化的操作使用 callBack 作为回调
+				1.使用 数据库连接池 获取 链接来创建 PreparedStatement druid
+					校验链接状态: 链接不为 null, 链接没有关闭, 链接可以以使用
+
+					把参数封装到 PreparedStatementKey 中, 最终封装为 DruidPooledPreparedStatement.
+				2.执行 回调(方法内部声明callBack类)
+					检查链接是否打开
+					添加执行标志
+					***设置参数***
+						对传入的参数进行类型识别, Collection, Object[], obj, 进行递归设置, 
+						设置的时候获取 sqlTypeToUse typeNameToUse inValueToUse
+					执行sql
+					清除参数
+				3.警告处理
+				4.返回结果
+				5.关闭Statement
+				6.释放链接
+					如果存在事务,则使用connectionHolder 中的 release 方法,进行链接数减一
+					否则直接释放链接
+		Ⅱ. PreparedStatement --> Statement 
+			sql 执行之前 需要 将 ?  通过 setter 来赋值, 因为 PreparedStatement 已经预编译过, 所以执行速度要快于 Statement
+			有参数的时候,时候 预编译sql, 没有的时候直接使用statement
+七.Mybatis
+	Ⅰ.独立使用
+		1.首先要配置 Mybatis
+			见 附十四.
+		2.编写mapper
+		3.测试
+	Ⅱ.spring_with_mybatis					| --> FactoryBean
+		1.spring 提供了 SqlSessionFactoryBean | --> ApplicationEvent 来配置mybatis
+											| --> InitializingBean 
+			InitializingBean.afterPropertiesSet()
+				构建 DefaultSqlSessionFactory, SpringManagedTransactionFactory  这个过程spring 还添加了以spring的方式来注入属性的方式,并兼容了mybatis自己的解析方式.
+			FactoryBean.getObject() 和 InitializingBean 功能一样
+			创建 SqlSessionFactory 的时候,会根据 配置的 mapperLocation 去扫描 mapper, 然后将一系列 sql 转换为 MappedStatement
+		2.spring 提供了 MapperFactoryBean, | --> InitializingBean initDao
+										 | --> FactoryBean
+			 InitializingBean 
+			 	SqlSession(自动注入)的验证, 然后将 类型-配置文件注册到 knownMappers中,然后再 FactoryBean.getObject 的 时候,通过 knownMappers获取配置 通过jdk MapperProxy 动态代理来创建代理
+	 	3.使用 MapperFactoryBean 需要手动一个个的去注册mapper, 拉低效率,
+	 	因此spring 还提供了 MapperScannerConfigurer 来通过扫描的方式自动注册 mapperBean
+	 		 						| --> InitializingBean 			校验 配置的 mapperLocation
+			MapperScannerConfigurer | --> ApplicationContextAware 	注入 AopContext
+	 								| --> BeanNameAware				注入beanName
+	 								| --> BeanDefinitionRegistryPostProcessor.postProcessBeanDefinitionRegistry()
+
+				1.spring 在主流程中, 会根据一定顺序 (见二.ApplicationContext) 激活(invokeBeanFactoryPostProcessors)所有注册的 BeanDefinitionRegistryPostProcessor --> BeanFactoryPostProcessor,
+				执行他们的 postProcessBeanDefinitionRegistry(), postProcessBeanFactory();
+				2.这时候 MapperScannerConfigurer 会进行 mapper 的扫描配置注册
+					1. 根据配置注册过滤器,在后期扫描到java 类的时候进行过滤
+					2.把配置文件中传入的路径进行分割,在分别进行扫描 (PathMatchingResourcePatternResolver)
+						这时候会对 basePackage 进行包分隔符转换 "\"-->" "/", 然后进行递归扫描, 包下所有.class 文件("**/*.class"),然后进行验证, 
+						区分: vfs类型, bundle类型, jar包类型, 
+					3.把扫描到的 mapper 封装为 ScannedGenericBeanDefinition, 然后注入resource...,最终封装为 BeanDefinitionHolder,
+					4.创建的时候,通过aop 把 sqlSessionTemplate 封装到 bean中	
+
+
+
+
+			AntPathMatcher	"""路径匹配器"""
+				match(String, String)
+				1.先判断二者的开头是否一致
+				2.把 patten --> token
+					把 patten 用 "/" 分割, 然后缓存起来, 返回String[]
+	Ⅲ. myatis 运作:
+
+		1. 通过 MapperProxy 来代理bean, 从代理中获取到缓存的 method, 然后传入 sqlSessionTemplate (mapper 内部封装) 和 args 激活 方法
+		2. 判断 当前方法是什么类型的方法(增/删/改/查)
+			查: 通过 sqlSessionProxy(DefaultSqlSession) 来实现方法
+				检查 mehtod  的返回类型: void Many, Map, Curstor, 对象类型
+					对象类型: 将 args ==> sqlCommondParams 调用 selectOne --> selectList 然后判断结果集数量, 0 == null, 1== obj, >1 throw TooManyResultsException()
+							通过 SqlSessionInterceptor 来创建代理,实现增强事务,
+								1.创建会话: 开启事务, 将事务交给 SpringManagedTransaction 来管理, 根据配置的 executorType (default simple) 来创建 sql Executor, 如果允许缓存 便封装为CacheedExecutor,然后添加 interceptor(org.apache.ibatis.plugin.Interceptor)
+								2.激活方法	通过方法全名作为id,在缓存好的 mappedStatements 中找到 MappedStatement
+								3.使用 executor 来执行 查询
+									首先在 创建cacheKey (date-method-sql-params-bean), 在 MappedStatement 的缓存中查询, 如果有则验证缓存是否有效, 然后直接解析返回, 
+									否则 创建handler并把 statement 封装为preparedstatement, 然后获取 connection 来查询, 最终通过 DeafaultResultSetHandler 来解析结果返回, 
+                                    "解析result"(根据resultMap)
+                                    ResultSetWrapper 里封装了<resultMap> 中的一些 属性: javatype, jdbcType, columnName
+                                    如果没有resultHandler则使用默认的 DefaultResultHandler 来进行解析,并对结果进行封装
+                                        如果是嵌套的结果类型 (nested:嵌套的), 则需要对resultHandler类型进行检查: configuration.isSafeResultHandlerEnabled() && !mappedStatement.isResultOrdered()
+                                        循环对resultSet进行解析: context.isStop = false, rowBonds < limt(Integer.MAX_VALUE)
+                                            根据resultMap中的colums 来创建cachekey: '88911490:-850141472:com.itmuch.mapper.SysRoleMapper.roleAccessMap:id:1'
+                                            然后根据这个 cacheKey 从解析的结果集中获取 已经解析的obj, 然后根据这个已经解析的obj去解析本行, 解析结束后,如果 obj != null 则 存储起来
+                                                解析的时候,如果 传来的 obj 为 null, 则会通过反射来创建一个 接收对象, 所以 封装对象的 集合 对象必须在创建的时候,进行初始化.
+                                                所以这个rowKey 就是能否对 resultMap 中的 collection 进行封装解析的关键, 它的创建规则需要根据 resultMap 中的 column==> id 来进行
+                                    "所以得出结论==> 对于collection类型的resultMap, 必须配置 id"
+                                              "===> 这个collection对应的属性,必须进行初始化"
+                                              见附16
+
+							提交事务
+							关闭链接
+			增: 
+
+
+
+
+七_hibernate
+	Ⅰ.启动的时候是, 创建 DAO 的时候,自动注入 sessionFactory
+		这时候创建hibernate localSessionFactoryBuild sfb(initializeBean, Factorybean)
+		
+八 Transactional:spring事务(自定义标签) 
+	*在主流程的 AbstractAutoProxyCreator extend Beanpostprocessor.postProcessAfterInitialization()方法中完成
+	Ⅰ.使用: 见附十五
+	Ⅱ.spring_transation
+		开启注解事务
+		<tx:annotation-driven transaction-manager="transactionManager" mode="aspectj"/>
+		1.自定义标签的解析
+			根据配置的代理 model(包含 aspectj 和 proxy'默认' 两种模式)来进行配置, 但他们都需要注册 TransactionalEventListenerFactory 
+				如果配置是 aspectj
+					
+				如果配置是 proxy (默认)
+			2.在解析 xml 的时候,注册 InfrastructureAdvisorAutoProxyCreator --> InstantiationAwareBeanPostProcessor 后置处理的时候实现增强
+				增强:
+
+			3. 创建 三个 BeanFactoryTransactionAttributeSourceAdvisor, AnnotationTransactionAttributeSource, TransactionInterceptor bean 封装到CompositeComponentDefinition 中.
+				三个bean支撑了整个事务功能
+		2.创建 bean 的时候实现增强
+			1. 找出bean 对应的增强器
+				1.找出所有的增强器
+					先在缓存中获取,如果没有再去 factory 中 查找 Advisor.class bean
+					这个时候之前注册 的三个 bean(其实是一个包含两个,连体) 开始被织入,开始发挥增强
+				2.匹配增强器,两种类型
+					引介增强: IntroductionAdvisor && canApply() 
+					普通bean: !IntroductionAdvisor && canApply() 
+					 canApply():
+					 	IntroductionAdvisor类型:
+
+					 	PointcutAdvisor类型
+					 		找到被代理类的所有接口,进行遍历, 找到他们所有声明的方法,对方法进行遍历, 如果PointcutAdvisor不是IntroductionAwareMethodMatcher则可以增强
+					 		可以增强:
+					 			matches()-->getTransactionAttribute() "检测流程引擎" [--> computeTransactionAttribute() 会在 method上 class上 interface中的 method上 和 interface class上 分别进行 TransactionalAttribute 的检测   -->	findTransactionAttribute() -->determineTransactionAttribute() --> 通过 SpringTransatioAannotionPaser 和 JtaTransationAnnotationPaser 来检测是否具有事务
+					 				--> parseTransactionAnnotation() --> AnnotatedElementUtils.getMergedAnnotationAttributes(ae, Transactional.class),获取Element 中的关于 Transactional 的 Attributes, 在 attributes 中检测 (Propagation Isolation Timeout ReadOnly Qualifier RollbackFor
+					 				RollbackForClassName NoRollbackFor)这些事务属性, 并封装到 RuleBasedTransactionAttribute 统一返回, 返回后缓存]	返回不为null则可以增强
+			2.根据找出的增强器创建代理
+				通过 proxyFactory, 来创建代理,看 aop
+			3.执行方法,进行事务增强 TransactionInterceptor
+				此时的实例已经是被增强过的代理实例.
+					1.获取事务属性
+					2.加载TransationManager
+					3.对不同形式的事务进行处理
+						spring 有两种类型的事务, 1.声明式事务,2.编程式事务,他们的大体逻辑一致,只是实现方式有区别
+
+							1.创建 TransactionInfo
+								1.配置事务名称(如果没有,则使用方法名称)
+								2.获取 TransactionStatus
+									1. 根据事务实例(jpa,Hibernate, jdbc), 新建 TransactionObject, 如果当前线程已经记录数据库链接,则直接使用原有链接
+									2. 判断当前线程是否存在事务: 当前线程存在链接 && 链接不为空
+									如果存在直接使用当前事务来处理
+											隔离机制						处理方式
+											 PROPAGATION_NEVER 			抛出异常
+											 PROPAGATION_NOT_SUPPORTED	在原有事务上继续操作
+											 PROPAGATION_REQUIRES_NEW 	开启新事物
+											 PROPAGATION_NESTED 		用于嵌套事务处理, 独立于原有事务提交/回滚
+											 ISOLATION_DEFAULT			在原有事务上继续操作
+									否则
+									3.判断事务超时
+									4.验证事务传播机制
+										 	1.PROPAGATION_MANDATORY  抛出异常
+										 	2.PROPAGATION_REQUIRES_NEW - PROPAGATION_NESTED
+										 		1.构建 DefaultTransactionStatus,
+										 		2.完善transation, 设置链接,如果没有则从dataSource获取,设置隔离级别,更改自动提交-->spring控制提交,设置当前事务已被激活,
+										 		设置过期时间, 设置只读标识,设置connection的隔离级别将当前链接绑定到线程(本地线程维护的map)
+										 		3.绑定事务信息到当前线程
+										 	3.没有事务传播机制
+								3. 根据 TransactionStatus 来准备TxInfo
+									将所有事务信息统一记录在TransationInfo中,一旦事务失败(出现Throwable),则通过txInfo中的信息来进行回滚.
+							2.执行增强/异常回滚(RuntimeException)
+								1.回滚条件:
+									默认情况下只对 RuntimeException 和 Error 进行处理,当然可以通过 RollbackFor = Exception.class 来进行配置
+								2.回滚处理,如果事务状态为 complated, 则再次回滚抛出异常:
+									激活 beaforCompletion()
+									如果事务有保存点,则当前事务为单独的线程根据'数据库链接'退回到保存点
+									如果当前事务不是独立事务,则标记状态,等事务链执行完毕后,统一回滚
+									如果当前事务是独立的新事物,则直接回滚
+									激活 afterCompletion()
+									清空记录的资源并恢复挂起的资源,设置完成状态,解绑链接&线程,恢复链接自动提交属性,重置链接,如果所属的事务独立则释放链接,结束之前挂起的事务
+							3.清除信息
+								设置 TransactionStatus 为 oldTransactionStatus
+							4.提交事务
+								检测是否有回滚标记,如果有,则执行回滚而不会提交. 见回滚处理
+								真正提交:
+									触发注册的 TransactionSynchronization 方法
+									如果存在savePoint,则清除,而不会去提交
+									如果是独立的事务,则直接提交, 如果事务不是新事务的时候,也不会去提交.而是由最外层事务一并移交
+									spring 会将提交操作,引导至 connection 的 API 来提交
+							
+九: SpringMVC('Servlet生命周期', 'http请求处理周期')
+	mvc是基于servlet功能实现的
+	使用spring的时候,将spring配置信息作为参数直接传入spring容器当中:
+        ApplicationContext context = new ClassPathXmlApplicationContext("factory&context/bean_i8n.xml");
+    但是在 Web.xml下,注册并使用 ContextLoaderListener 监听器, StanderContext-->lifecycle 启动的时候, 会调用 listener 的 contextInitialized()方法.
+    	<!--' ContextLoaderListener 的作用就是启动Web容器时, 自动装配 ApplicationContext 配置信息' -->
+
+	web.xml 对 servlet 进行配置(welcome页面, servlet, servlet-mapping, filter, listener, 启动加载项), 所以web.xml 是必须的.
+
+	一. WebApplicationContext "而springboot 项目, 启动的时候默认不加载servlet, 在第一次访问的时候,才会创建dispatcherServlet "
+		tomcat启动的时候 StandardContext 会 initWebApplicationContext(event),
+		1. 检测 servletContext 中 WebApplicationContext 是否已创建,如果已创建,则抛异常(只能创建一个)
+		2. 初始化 WebApplicationContext
+			1.从配置文件中找到要用的 WebApplicationContext 的具体子类 --> XmlWebApplicationContext
+			2.通过反射创建一个 实例
+		3. 对 WebApplicationContext 类型检测,并完善
+		4. 将 WebApplicationContext 记录在 servletContext 中
+		5. 映射当前的类加载器与创建的实例到全局变量 currentContextPerThread 中。
+	二. 	DispatcheServlet --> HttpServletBean
+		DispatcheServlet 在加载的时候,会 加载 DispatcheServlet.properties 来初始化一些变量,作为默认参数
+		servlet 是一个Java编写的程序,此程序是基于Http,在服务端运行的按照 servlet 规范编写的一个类,主要是处理客户端请求并将结果返回到客户端,
+		servlet 生命周期由 servlet容器控制, 可以分为 初始化,运行和销毁三个阶段
+		1.初始化 
+			servlet 容器加载 servlet 类
+				解析 & 验证 init-param, 并将 servlet --> beanWrapper
+				 contextAttribute、 contextClass、 nameSpace、 contextConfigLocation 属性的注入
+				 servletBean 的初始化
+				 	1.寻找 || 创建 WebApplicationContext 实例,初始化 spring 环境(执行spring的一系列操作) 加载配置文件 "这里创建的是XmlApplicationContext",
+
+				 		然后在tomcat 容器加载component的时候, 会初始化 servlet, 这时候会初始化 ConfigurableWebApplicationContext 的功能, 在 ApplicationContext refresh 的时候,会发布刷新事件, 监听器监听到事件后,会对 Dispatche『Servlet 进行 refresh(模板方法)
+				 		initMultipartResolver(context);//文件上传
+						initLocaleResolver(context);//国际化
+							spring 使用国际化有三种方式, url参数中 local=zh_CN; 基于session: 在请求头中 accept-language; 基于cookie: 从cookie中取得 Locale 对象
+						initThemeResolver(context); //主题 配置 Dispatche『Servlet 在那个包下寻找资源
+						initHandlerMappings(context); //找controller
+							<bean id="urlHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+						   		<property name="mappings">
+						   			<props>
+						   				<prop key="/userlist">userController</prop>
+						   			</props>
+						   		</property>
+						   </bean>
+						initHandlerAdapters(context);//适配器模式: 	HttpRequestHandlerAdapter,SimpleControllerHandlerAdapter,AnnotationMethodHandlerAdapter; 如果开发人员没有指定适配器,spring则会默认使用 配置的三个适配器,
+						initHandlerExceptionResolvers(context);
+						initRequestToViewNameTranslator(context);//返回视图名称解析类 解析, default DefaultRequestToViewNameTranslator. 当 Controller 处理器方法没有返回一个 View 对象或逻辑视图名称，并且在该方法中没有直 接往 respons巳的输出流里面写数据的时候， Spring 就会采用约定好的方式提供一个逻辑视图名 称
+						initViewResolvers(context);//试图解析器 default: InternalResourceViewResolver. Controller 将请求处理结果放入到 Mode!AndView 中以后 ， DispatcherServlet 会根据 Mode!AndView 选择合适的视图进行渲染
+						initFlashMapManager(context); //请求存储属性，可供其他请求使用。 在使用重定向 时候非常必要，例如 Post/Redirect/Get 模式。 Flash at仕ibutes 在重定向之前暂存（就像存在 session 中）以便重定向之后还能使用，并立即删除。 
+
+			servlet 容器 创建一个 servletConfig 对象, 包含 servlet 初始化信息
+			servlet 容器 实例化一个 servlet 对象
+			servlet 容器 调用 servlet 的init()方法
+		2.运行
+			 servlet 容器会针对这个请求创建 servletRequest 和 servletResponse 对象，然后调用并把这两个参数传递给 service 方法。 service 方 法通过 servletRequest 对象获得请求的信息。 并处理该请求。 再通过 servletResponse 对象生成 这个请求的响应结果。 然后销毁 servletRequest 和 servletResponse 对象。 我们不管这个请求是 post 提交的还是 get 提交的，最终这个请求都会由 service 方法来处理
+		 3.销毁
+		 	当 Web 应用被终止时，servlet 容器会先调用 servlet对象的 destrory 方法，然后再销毁 servlet 对象，同时也会销毁与 servlet 对象相关联的 servletConfig 对象。 我们可以在 destroy 方法的实 现中，释放 servlet所占用的资源，如关闭数据库连接，关闭文件输入输出流等
+
+ 	三. DispatcheServlet 的处理逻辑
+ 		1. 提取 localeContext 和 requestAttributes ，并绑定到当前线程, 
+ 		委托给doservice()处理
+ 		   1. 给request 补充 context, themResolver, flashMapManager 等属性
+ 		   2. 检测是否包含文件的请求: 是post请求 && contentType.toLowerCase(Locale.ENGLISH).startsWith("multipart/") 
+ 		   		1. 获取 nativeMultipartHttpServletRequest
+ 		   		2. 解析获取文件,这里还可以配置 lazyResolver
+ 		   			1.获取编码,default iso-8859-1
+ 		   			2.判断当前 请求大小是否超限
+ 		   			3.解析 contentType ==> map, 在map中找到 boundary 的 value 的 bytes
+ 		   			4.迭代找到filename, 并封装为 MultipartFile
+	   			3. 将request 封装为 DefaultMultipartHttpServletRequest
+   			3. 找到处理该请求的 handler
+   				1.遍历handlerMapping 找到 访问的 path,
+   				2.根据 访问的 path 找到对应的 handler/handlerMethod
+   				3.把 handler 封装为 HandlerExecutionChain, 并添加 interceptor(PathExposingHandlerInterceptor)
+   				4.把配置中的拦截器添加到 chain 中, 根据handlerMapping来匹配 path
+   				5.检查是否是 跨域 请求, 如果是则添加 CorsHandlerExecutionChain
+   				6.如果没有找到 handler, 则使用默认handler, 如果没有配置默认 handler, 则再次回滚抛出异常
+			4. 根据找到的handler 来找到 handlerAdapter
+			5. 缓存处理 Last-Modified 机制,
+				第一次访问 响应头会加上 Last-Modified, 标识此文件在服务器上的最后更新时间
+				之后访问, 客户端会添加 IF-Modified-Since 字段,来询问服务器资源是否被修改过,如果没有则自动返回304, 节省带宽
+			6. HandlerInterceptor 的 preHandler()
+				1.注册
+					<mvc:interceptors>
+				        <mvc:interceptor>
+				            <mvc:mapping path="/**"/>
+				            <bean class="com.itmuch.interceptor.CustomerHandlerInterceptor" id="interceptor" />
+				        </mvc:interceptor>
+    				</mvc:interceptors>
+				2. 处理, 如果返回 false, 则会结束方法
+				3. interceptor 的加载:
+					1. 声明的 HandlerInterceptor 会被封装为 MappedInterceptor
+					2. 创建 controller的时候 SimpleUrlHandlerMapping --> ApplicationContextAware.setApplicationContext()的时候 会将 MappedInterceptor 封装到 handler中
+					3. xml中 inteceptor 的执行取决于 bean 声明的先后
+					4. 而关于filter, 他们都是基于 url 进行 匹配的. 是javax.servlet;包下的功能,层面是相对于servlet的, 而 interceptor 是相对于业务层面的,宽度稍窄.
+						而且貌似将filter 声明到bean.xml 中是不会生效的
+			7. 实际业务逻辑处理, 
+				先对参数进行绑定, 如果参数无法被 系统中的messageconvert (主要还是mappingjackson2httpmessageconvert)转换-- 其实还是jackson 的 objectMapper,则 抛出异常, 
+			8. 如果没有 viewname, 则设置默认 viewname
+			9. HandlerInterceptor 的 postHandler()
+			10. 最后 处理
+				1.异常处理
+				2.渲染
+					1.根据 viewResolver 来找到对应的资源 View
+					2.	render() jasper
+			11. HandlerInterceptor 的 afterCompletion()
+ 		2. 复原 线程原始状态
+ 		3. 发布事件
+
+Day_2020_2_24
+十.RMI (remote method invocation)
+	宗旨: 简化远程调用接口对象的使用
+	通过'接口'来隐藏底层的实现细节
+十一.springboot_aotoconfiguration
+@EnableAutoConfiguration
+@Import(EnableAutoConfigurationImportSelector.class)
+	1.springboot 启动的时候,会 准备 sping 环境, 根据能否加载某些特定的类,来设置 ApplicationContext的类型(none, reactive, servlet) env的 类型, 发布 ApplicationEnvironmentPreparedEvent 事件, 从而被装配的监听器监听,事件被 ConfigFileApplicationListener 监听后, 会进行配置文件的加载,如果引入了spring-cloud-context 会自动装配 BootstrapApplicationListener, 然后通过创建 SpringApplicationBuilder 来创建 AnnotationAutoConfigurationApplicationContext
+		StandardEnviroment --> PropertyResolver 存储着spring所有的properties
+		env.peopertySource.PropertySourcesList.array.ConfigurationPropertySource.sources 以hashMap的形式存储着application.yml中的 metadata
+	2.通过反射创建context, 如果环境中获取到 是web项目,则会通过反射创建调用空构造 AnnotationConfigEmbeddedWebApplicationContext, 
+		public AnnotationConfigEmbeddedWebApplicationContext() {
+			this.reader = new AnnotatedBeanDefinitionReader(this);
+			this.scanner = new ClassPathBeanDefinitionScanner(this);
+		}
+		向其中注册一系列的 BeanDefinition 包括 internalConfigurationAnnotationProcessor(ConfigurationAnnotationProcessor)
+	3.spring 生命周期 refrshContext的 invokeBeanFactoryPostProcessors()中, 激活注册 的 ConfigurationAnnotationProcessor,
+		1.首先在registry中获取所有的 beanName, 然后遍历,看 :
+			如果 BeanDefinition.attribute 中含有("full" || "lite") 则代表已经被处理过了("Bean definition has already been processed as a configuration class")
+			然后再 从 bean 中获取元数据, 如果类被 @Configuration, @Component, @ComponentScan, @Import, @ImportResource, @Bean修饰过 则需要进行处理, (configCandidates)
+		2.然后创建 ConfigurationClassParser 根据bean类型 来处理 configCandidates'beans',
+			1. AnnotatedBeanDefinition 类型, 如果 被 @PropertySources 	--> properties
+													@ComponentScans 	--> 进行递归检测,配合 ClassPathBeanDefinitionScanner, 会找到 basePackage 包下所有class文件,并进行是否符合规则,
+																			@Conditional 的检测, 获取 conditional 的所有属性,
+
+													@Import(class<?>[]) --> 循环引入处理(EnableAutoConfiguration, AutoConfiguration), 通过 EnableAutoConfigurationImportSelector 								来扫描所有符合的类,(AutoConfig), 所以这四个方法之间存在循环套用
+													@ImportResource		--> 文件则引入 也可以是 xml配置文件
+													@Bean 				--> bean
+			2. AbstractBeanDefinition
+			3.selectImports(),
+			4.processDeferredImportSelectors(), 进行自动装备配, spring启动类中的 EnableAutoConfigurationImportSelector.class 开始发挥作用, 循环遍历(使用过滤器) jar包中的 META-INF/spring.factory 然后反射成 类实例,
+		3.将 configCandidates --> BeanDefinition
+	4. conditional 原理:
+		AutoConfigurationClass 被扫描到的时候, 会对其进行配置扫描,然后判断其是否符合自动装配条件:
+			1.在元数据中获取@Conditional.class
+			2.执行子类实现的 findNoMatchOutcomes()方法,根据conditional 的所有属性 来 匹配 env中的属性来创建 noMatchOutcomes, 如果 noMatchOutcomes 为空,则表明匹配,可以进行配置
+
+	
+
+	ApplicationContext 在 refresh()的时候,执行模板方法,
+	第二步, invokeBeanFactoryPostProcessors  的时候
+		会注册处理
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+附一----spring-xml-自定义标签的实现:
+	1.编写自定义xml解析xsd标签, 解析内容对应自定义bean
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema"
+		        targetNamespace="http://www.lexueba.com/schema/user"
+		        xmlns:tns="http://www.lexueba.com/schema/user"
+		        elementFormDefault="qualified">
+		    <element name="user">
+		        <complexType>
+		            <attribute name="id" type="string" />
+		            <attribute name="username" type="string" />
+		            <attribute name="emial" type="string" />
+		        </complexType>
+		    </element>
+		</schema>
+	2.编写自定义解析器 UserBeanDefinitionParser extends AbstractSingleBeanDefinitionParser, 重写方法
+		/**
+	     *  element 对应的类
+	     */
+	    @Override
+	    protected Class<?> getBeanClass(Element element) {
+	        return User.class;
+	    }
+	    @Override
+	    protected String getBeanClassName(Element element) {
+	        return  User.class.getName();
+	    }
+	    /**
+	     * 从element 中解析并提取对应的元素,
+	     * 将提取到的数据放入beandefinitionBuilder,中,待到完成所有bean的解析后统一注册到beanFactory中
+	     */
+	    @Override
+	    protected void doParse(Element element, BeanDefinitionBuilder builder) {
+	        String username = element.getAttribute("username");
+	        String email = element.getAttribute("email");
+	        if(StringUtils.hasText(username)){
+	            builder.addPropertyValue("username", username);
+	        }
+	        if(StringUtils.hasText(email)){
+	            builder.addPropertyValue("email", email);
+	        }
+	    }
+    3.实现自己定义namespace解析器, 将自定义解析器注册到spring中 CustomerNamespaceHandler extends NamespaceHandlerSupport
+    	/**
+	     * 把组件注册到Spring容器中,
+	     * 当遇到 类似 user:*** 这样以user开头的元素, 则交给 UserBeanDefinitionParser 来解析
+	     */
+	    @Override
+	    public void init() {
+	        registerBeanDefinitionParser("user", new UserBeanDefinitionParser());
+	    }
+    4.在spring.bean META-INF/ 目录下添加 spring.handler 文件:
+    	http://www.lexueba.com/schema/user=com.itmuch.CustomerNamespaceHandler
+    									spring.schema 文件:
+		http://www.lexueba.com/schema/user=META-INF/user-praser.xsd
+	5.在 bean.xml 文件中引入对应的命名空间和xsd使用 自定义标签时, 使用user: 开头
+
+附二: registerBeanDefinition 注册
+	
+	BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+	1.对 method-overrides 进行进行校验
+	2. 对 bean-name 是否被使用过校验
+	3.将 name, alias 存储到map中, 防止二次使用
+
+
+
+	springboot 启动的时候会注册一系列的beanpostprocessor
+
+附三:java 弱引用, 软引用
+	区别:
+		GC回收对象时, 软引用指向的对象只在内存不足的时候被回收
+		而弱引用指向的对象在下一次GC时被回收
+		软引用用来描述一些有用但不是必须的对象, 可以很好的解决OOM的问题, 可以用来缓存网页/图片
+
+附四: spring 自定义属性解析器
+	public class PropertyEditorSupportImpl extends PropertyEditorSupport {
+    private String format = "yyyy-MM-dd";
+	    @Override
+	    public void setAsText(String text) throws IllegalArgumentException {
+	        SimpleDateFormat format = new SimpleDateFormat(this.format);
+	        try{
+	            Date time = format.parse(text);
+	            this.setValue(time);
+	        }catch(Exception ex){
+	            ex.printStackTrace();
+	        }
+	    }
+	}
+	<!-- 自定义属性编辑器 -->
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="java.util.Date">
+                    <value>com.itmuch.app.applicationcontext.PropertyEditorSupportImpl</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+附五: spring 注册自定义属性解析器
+	public class CustomerPropertiesEditorRegistrar implements PropertyEditorRegistrar {
+	    @Override
+	    public void registerCustomEditors(PropertyEditorRegistry registry) {
+	        registry.registerCustomEditor(Date.class,
+	                new CustomDateEditor(new SimpleDateFormat("yyy-MM-dd"), true));
+	//        registry.registerCustomEditor(...);
+	    }
+	}
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer" >
+        <property name="propertyEditorRegistrars">
+            <list>
+                <bean class="com.itmuch.app.applicationcontext.CustomerPropertiesEditorRegistrar" />
+            </list>
+        </property>
+    </bean>
+附六: 配置文件的引入, ${ } 的填充
+	 <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>bean.properties</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="helloBean" class="com.itmuch.app.HelloBean" autowire="byName">
+        <property name="name" value="${hello}" />
+    </bean>
+    bean.properties
+    	hello=world
+附七: 国际化配置:
+	message_en_US.properties:
+		test=test_english
+	message_en_US.properties:
+		test=测试
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>i18n.message</value>
+            </list>
+        </property>
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean>
+    test:
+     	Object [] params = {"polunzi", new GregorianCalendar().getTime()};
+        String str1 = context.getMessage("test", params, Locale.US);
+        String str2 = context.getMessage("test", params, Locale.CHINA);
+附八: 事件广播机制:
+	如果是springboot 项目:
+		在启动类上加上@EnableAsync
+        在onevent()上加上@Async 则可以支持异步
+	public class ErrorHandlerImpl implements ErrorHandler {
+
+	    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorHandlerImpl.class);
+	    @Override
+	    public void handleError(Throwable t) {
+	        LOGGER.info(t.getMessage());
+	    }
+	}
+	<bean id="defaultEventErrorHandler" class="com.itmuch.app.applicationcontext.event.ErrorHandlerImpl" />
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean">
+        <property name="maxPoolSize" value="50"/>
+        <property name="corePoolSize" value="10"/>
+        <property name="keepAliveSeconds" value="1800"/>
+        <property name="queueCapacity" value="1000"/>
+        <property name="daemon" value="true"/><!-- 跟随容器一起关闭 -->
+
+    </bean>
+    <bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster" >
+        <property name="taskExecutor" ref="taskExecutor"/>
+        <property name="errorHandler" ref="defaultEventErrorHandler" />
+    </bean>
+    <bean id="eventListener" class="com.itmuch.app.applicationcontext.event.SpringEventListener"/>
+附九: 自定义属性解析器
+	public class String2DateConvert implements Converter<String, Date> {
+
+	    @Override
+	    public Date convert(String source) {
+	        try{
+	            return DateUtils.parseDate(source, "yyyy-MM-dd");
+	        }catch(Exception ex){
+	            ex.printStackTrace();
+	            return null;
+	        }
+	    }
+	}
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="com.itmuch.applicationcontext.convert.String2DateConvert"/>
+            </list>
+        </property>
+    </bean>
+
+
+
+
+
+附十二: jdk 动态代理实例
+	public interface UserService {
+	    public abstract void add();
+	}
+	public class UserServiceImpl implements UserService {
+	    @Override
+	    public void add() {
+	        System.out.println("--------add---------");
+	    }
+	}
+	public class UserServiceInvocationHandler implements InvocationHandler {
+	    private Object target;
+	    public UserServiceInvocationHandler(Object target) {
+	        super();
+	        this.target = target;
+	    }
+	    @Override
+	    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+	        System.out.println("===========befor=============");
+	        Object result = method.invoke(target, args);
+	        System.out.println("==========after================");
+	        return result;
+	    }
+	    public Object getProxy(){
+	        return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+	                target.getClass().getInterfaces(), this);
+	    }
+	}
+	public static void main(String args[]) throws Exception{
+        UserService service = new UserServiceImpl();
+        UserServiceInvocationHandler invocationHandler = new UserServiceInvocationHandler(service);
+        UserService proxy = (UserService)invocationHandler.getProxy();
+        proxy.add();
+    }
+附十三: CGLIB 代理:
+	public class MethodInteceptorImpl implements MethodInterceptor {
+	    @Override
+	    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+	        System.out.println("befor invoke: " + method.getName());
+	        Object result = methodProxy.invokeSuper(o, objects);
+	        System.out.println("after invoke: " + method.getName());
+	        return result;
+	    }
+	}
+	public static void main(String args[]) throws Exception{
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(UserServiceImpl.class);
+        enhancer.setCallback(new MethodInteceptorImpl());
+        UserServiceImpl proxy = (UserServiceImpl)enhancer.create();
+        proxy.add();
+    }
+附十四: MYbatis 独立使用配置
+	public class MybatisUtils {
+	    private final static SqlSessionFactory SQL_SESSION_FACTORY;
+	    static {
+	        String resource = "mybatis/mybatis_use_alone.xml";
+	        Reader reader = null;
+	        try{
+	            reader = Resources.getResourceAsReader(resource);
+
+	        }catch(Exception ex){
+	            ex.printStackTrace();
+	        }
+
+	        SQL_SESSION_FACTORY = new SqlSessionFactoryBuilder().build(reader);
+	    }
+
+	    public static SqlSessionFactory getSqlSessionFactory(){
+	        return SQL_SESSION_FACTORY;
+	    }
+	}
+	@Test
+    public void test2(String args[]) throws Exception{
+        SqlSession session = sessionFactory.openSession();
+        try{
+            UserMapper userMapper = session.getMapper(UserMapper.class);
+            User user = new User("xiaoming", 25, "男");
+            userMapper.insert(user);
+            Long maxId = userMapper.getMaxId();
+            User db = userMapper.selectById(maxId);
+            System.out.println(db.toString());
+            session.commit();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally{
+            session.close();
+        }
+    }
+    <?xml version="1.0" encoding="utf-8"?>
+	<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	<mapper namespace="com.itmuch.mybatis.UserMapper" >
+	    <insert id="insert" parameterType="com.itmuch.jdbc.User">
+	        insert into t_user (name, age, sex)
+	        values(#{name,jdbcType=VARCHAR}, #{age, jdbcType=INTEGER}, #{sex, jdbcType=CHAR}  )
+	    </insert>
+	    <select id="selectById" parameterType="java.lang.Long" resultType="com.itmuch.jdbc.User">
+	        select  id, name, age, sex from t_user where id = #{id,jdbcType=INTEGER}
+	    </select>
+	    <select id="getMaxId" resultType="java.lang.Long" >
+	        select max(id) from t_user
+	    </select>
+	</mapper>
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+	<configuration>
+	    <settings>
+	        <setting name="useGeneratedKeys" value="true"/>
+	        <setting name="defaultExecutorType" value="REUSE"/>
+	    </settings>
+	    <typeAliases>
+	        <typeAlias type="com.itmuch.jdbc.User" alias="User"/>
+	    </typeAliases>
+	    <environments default="development">
+	        <environment id="development">
+	            <transactionManager type="jdbc"/>
+	            <dataSource type="POOLED">
+	                <property name="driver" value="com.mysql.jdbc.Driver"/>
+	                <property name="url" value="jdbc:mysql://${ip}:3306/jdbc_test?zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=utf8" />
+	                <property name="username" value="root" />
+	                <property name="password" value="password" />
+	            </dataSource>
+	        </environment>
+	    </environments>
+	    <mappers>
+	        <mapper resource="mybatis/UserMapper.xml"/>
+	    </mappers>
+	</configuration>
+附十五: tx 的开启:
+	<tx:annotation-driven transaction-manager="transactionManager" mode="aspectj"/>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    /**
+     * chars [] 在候选的chars 里按顺序优先找到第一个出现的字符作为分割符, 以 '=' 作为k-v识别,来切割string,作为map
+     */
+    public static void testParameterParser(String args[]) throws Exception{
+        ParameterParser parser = new ParameterParser();
+        parser.setLowerCaseNames(true);//设置将key==>小写
+        Map<String, String> params = parser.parse("MULtipart/user=wangSHUAI;name=123;123,2;polunzi", ';');
+// 		params :
+//        multipart/user --> wangSHUAI
+//        name--> 123
+//        123,2-->null
+//        polunzi-->null
+    }
+附十: lifecycle 的使用
+	public class SmartLifecycleImpl implements SmartLifecycle {
+	    private ScheduledExecutorService executor;
+	    private Runnable runnable;
+	    private static Boolean isRunning = false;
+	    private static final Object LOCK = new Object();
+	    public void setExecutor(ScheduledExecutorService executor) {
+	        this.executor = executor;
+	    }
+	    public void setRunnable(Runnable runnable) {
+	        this.runnable = runnable;
+	    }
+	    @Override
+	    public void start() {
+	        synchronized (LOCK){
+	            this.isRunning = true;
+	        }
+	        new Thread(new Runnable() {
+	            @Override
+	            public void run() {
+	                try{
+	                    ScheduledFuture<?> result = executor.scheduleAtFixedRate(runnable, 0, 1000, TimeUnit.MILLISECONDS);
+	                    System.out.println(result.get());
+	                }catch(Exception ex){
+	                    ex.printStackTrace();
+	                }
+	            }
+	        }).start();
+	    }
+	    @Override
+	    public void stop() {
+	        synchronized (LOCK){
+	            this.isRunning = false;
+	            this.executor.shutdown();
+	        }
+	    }
+	    @Override
+	    public boolean isRunning() {
+	        return this.isRunning;
+	    }
+	    @Override
+	    public boolean isAutoStartup() {
+	        return true;
+	    }
+	    @Override
+	    public void stop(Runnable callback) {
+	    }
+	    @Override
+	    public int getPhase() {
+	        return 0;
+	    }
+	}
+
+	<bean id="customerRunnable" class="com.itmuch.applicationcontext.CustomerRunnable" />
+    <bean id="customerRunnabelTask" class="com.itmuch.applicationcontext.CustomerRunnableTask"/>
+    <bean id="executorService"  class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
+        <property name="daemon" value="true"/>
+        <property name="poolSize" value="4"/>
+        <property name="continueScheduledExecutionAfterException" value="true"/>
+        <property name="waitForTasksToCompleteOnShutdown" value="true"/>
+        <property name="threadNamePrefix" value="customer-background-task" />
+        <property name="scheduledExecutorTasks">
+            <list>
+                <bean id="systemOfferedTask" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
+                    <property name="delay" value="2000"/>
+                    <property name="fixedRate" value="true"/>
+                    <property name="runnable" ref="customerRunnabelTask"/>
+                    <property name="period" value="5000"/>
+                    <property name="timeUnit" value="MILLISECONDS"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="com.itmuch.applicationcontext.SmartLifecycleImpl">
+        <property name="runnable" ref="customerRunnable"/>
+        <property name="executor"  ref="executorService"/>
+    </bean>
+
+
+附十六:mybatis - collection的使用
+    @Getter
+    @Setter
+    public class RoleAccessDTO extends SysRole {
+        /**
+         * 角色拥有的菜单权限
+         */
+        private List<AccessDTO> accesses = Lists.newArrayList();
+    }
+    @Getter
+    @Setter
+    public class AccessDTO extends SysAccess {
+        private List<SysAccess> children = Lists.newArrayList();
+    }
+    <resultMap id="BaseResultMap" type="com.itmuch.model.SysRole" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="rolename" property="rolename" jdbcType="VARCHAR" />
+        <result column="descprit" property="descprit" jdbcType="VARCHAR" />
+      </resultMap>
+      <resultMap id="roleAccessMap" type="com.itmuch.dto.RoleAccessDTO" extends="BaseResultMap">
+        <collection property="accesses" javaType="com.itmuch.dto.AccessDTO">
+          <id column="pid" property="id"/>
+          <result column="url" property="url" jdbcType="VARCHAR" />
+          <result column="title" property="title" jdbcType="VARCHAR" />
+          <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+          <collection property="children" javaType="com.itmuch.model.SysAccess">
+            <id column="cid" property="id"/>
+            <result column="curl" property="url" jdbcType="VARCHAR" />
+            <result column="ctitle" property="title" jdbcType="VARCHAR" />
+            <result column="ccreated_time" property="createdTime" jdbcType="TIMESTAMP" />
+          </collection>
+        </collection>
+      </resultMap>
+      <select id="selectRoleAccessByID" parameterType="java.lang.String"  resultMap="roleAccessMap">
+        SELECT  r.id AS id, r.rolename, par.id AS pid,  par.title, par.url,  child.id AS cid, child.title ctitle, child.url curl
+        FROM sys_role r
+        LEFT JOIN sys_role_access ra ON r.id = ra.role_id
+        LEFT JOIN sys_access par ON par.id = ra.access_id
+        LEFT JOIN sys_access child ON child.parent = par.id
+        WHERE r.id = 1
+      </select>
+
+
+public static void main(String args[]){
+	System.out.println("1111");
+}
+
+
+
+2020_3_9 关于tomcat:
+	
+	component lifecycle
+
+	 *            start()
+ *  -----------------------------
+ *  |                           |
+ *  | init()                    |
+ * NEW -»-- INITIALIZING        |
+ * | |           |              |     ------------------«-----------------------
+ * | |           |auto          |     |                                        |
+ * | |          \|/    start() \|/   \|/     auto          auto         stop() |
+ * | |      INITIALIZED --»-- STARTING_PREP --»- STARTING --»- STARTED --»---  |
+ * | |         |                                                            |  |
+ * | |destroy()|                                                            |  |
+ * | --»-----«--    ------------------------«--------------------------------  ^
+ * |     |          |                                                          |
+ * |     |         \|/          auto                 auto              start() |
+ * |     |     STOPPING_PREP ----»---- STOPPING ------»----- STOPPED -----»-----
+ * |    \|/                               ^                     |  ^
+ * |     |               stop()           |                     |  |
+ * |     |       --------------------------                     |  |
+ * |     |       |                                              |  |
+ * |     |       |    destroy()                       destroy() |  |
+ * |     |    FAILED ----»------ DESTROYING ---«-----------------  |
+ * |     |                        ^     |                          |
+ * |     |     destroy()          |     |auto                      |
+ * |     --------»-----------------    \|/                         |
+ * |                                 DESTROYED                     |
+ * |                                                               |
+ * |                            stop()                             |
+ * ----»-----------------------------»------------------------------
+
+	Server server = new StandardServer()
+	Service service = new StandardService()
+	Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol")
+	Engine engine = new StandardEngine();(Container)
+
+
+	@Bean(name = DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
+	@ConditionalOnBean(value = DispatcherServlet.class, name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+	public ServletRegistrationBean<DispatcherServlet> dispatcherServletRegistration(
+			DispatcherServlet dispatcherServlet) {
+		ServletRegistrationBean<DispatcherServlet> registration = new ServletRegistrationBean<>(
+				dispatcherServlet,
+				this.serverProperties.getServlet().getServletMapping());
+		registration.setName(DEFAULT_DISPATCHER_SERVLET_BEAN_NAME);
+		registration.setLoadOnStartup(
+				this.webMvcProperties.getServlet().getLoadOnStartup());
+		if (this.multipartConfig != null) {
+			registration.setMultipartConfig(this.multipartConfig);
+		}
+		return registration;
+	}
+
+
+loadOnStartup < 0 continue;
+
+
+spring source code new word: 
+	eligible:	合格的
+	Generic:	原生的
+	Suspend:	挂起的
+	delegate:	委派
+	synthetic:	合成的,综合的
+	assignable:		可分配的；可指定的；可让渡的
+	deferred:	推迟的
+	syntax:		语法(/sɪntæks/)
+	nested:     嵌套的
