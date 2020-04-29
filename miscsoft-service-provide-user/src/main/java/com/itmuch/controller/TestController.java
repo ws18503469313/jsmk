@@ -22,9 +22,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.OutputStream;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("")
 public class TestController {
 
     private static final Logger log = LoggerFactory.getLogger(TestController.class);
@@ -79,8 +80,18 @@ public class TestController {
     }
     @RequestMapping("/framework")
     public void getFramework(HttpServletResponse resp)  throws Exception {
-        String filename = "framework.png";
-        ImageUtils.writeImage(resp, filename);
+        File file = new File(this.getClass().getResource("/frame.png").getPath());
+        resp.setContentType("image/png"); // 设置返回的文件类型
+        OutputStream outStream = resp.getOutputStream();// 得到向客户端输出二进制数据的对象
+        FileInputStream fis = new FileInputStream(file); // 以byte流的方式打开文件
+        // 读数据
+        byte data[] = new byte[1000];
+        while (fis.read(data) > 0) {
+            outStream.write(data);
+        }
+        fis.close();
+        outStream.write(data); // 输出数据
+        outStream.close();
 
     }
 
