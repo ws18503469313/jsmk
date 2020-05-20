@@ -13,9 +13,9 @@
         </plugin>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://123.206.14.25:3306/jshm?useSSL=false"
+                        connectionURL="jdbc:mysql://62.234.95.108:3306/bank1?useSSL=false"
                         userId="root"
-                        password="Ws123456.">
+                        password="Wsa1583505.">
         </jdbcConnection>
 
         <!-- 对于生成的pojo所在包 -->
@@ -38,5 +38,7 @@
 		 <!-- <table tableName="ss_collection"></table> -->
 		<!--  <table tableName="sys_authority"></table> -->
 		<!-- <table tableName="ss_wxresult"></table> -->
+		 <table tableName="account" />
+		 <table tableName="local_tx_log" />
     </context>
 </generatorConfiguration>

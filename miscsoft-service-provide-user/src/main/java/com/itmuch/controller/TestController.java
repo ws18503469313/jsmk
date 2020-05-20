@@ -78,20 +78,29 @@ public class TestController {
         return userMapper.selectByPrimaryKey(id);
 
     }
-    @RequestMapping("/framework")
-    public void getFramework(HttpServletResponse resp)  throws Exception {
-        File file = new File(this.getClass().getResource("/frame.png").getPath());
-        resp.setContentType("image/png"); // 设置返回的文件类型
-        OutputStream outStream = resp.getOutputStream();// 得到向客户端输出二进制数据的对象
-        FileInputStream fis = new FileInputStream(file); // 以byte流的方式打开文件
-        // 读数据
-        byte data[] = new byte[1000];
-        while (fis.read(data) > 0) {
-            outStream.write(data);
+    @RequestMapping("/framework/{pro}")
+    public void getFramework(@PathVariable String pro, HttpServletResponse resp)  throws Exception {
+        FileInputStream fis = null;
+        OutputStream outStream = null;
+        try{
+            File file = new File(this.getClass().getResource("/" + pro + ".png").getPath());
+//            resp.addHeader("Content-Disposition", "attachment;" + pro + ".png" );
+            resp.setContentType("image/png");
+            outStream = resp.getOutputStream();// 得到向客户端输出二进制数据的对象
+            fis = new FileInputStream(file); // 以byte流的方式打开文件
+            // 读数据
+            byte data[] = new byte[1000];
+            while (fis.read(data) > 0) {
+                outStream.write(data);
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally{
+            fis.close();
+            outStream.close();
         }
-        fis.close();
-        outStream.write(data); // 输出数据
-        outStream.close();
+
+
 
     }
 

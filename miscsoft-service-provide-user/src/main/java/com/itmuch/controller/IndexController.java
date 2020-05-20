@@ -118,7 +118,7 @@ public class IndexController extends CoreController{
 		    file = new File(path);
 		}
 		
-		response.setContentType("image/jpeg"); // 设置返回的文件类型
+		response.setContentType("image/png"); // 设置返回的文件类型
 		ServletOutputStream outStream = response.getOutputStream();// 得到向客户端输出二进制数据的对象  
         FileInputStream fis = new FileInputStream(file); // 以byte流的方式打开文件  
         // 读数据  
