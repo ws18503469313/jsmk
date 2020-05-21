@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 
 @RestController
-@RequestMapping("")
 public class TestController {
 
     private static final Logger log = LoggerFactory.getLogger(TestController.class);
@@ -99,16 +98,28 @@ public class TestController {
             fis.close();
             outStream.close();
         }
-
-
-
     }
 
-
-//    @RequestMapping("/framework")
-    public void get(HttpServletResponse resp)  throws Exception {
-
-
+    @RequestMapping("/resume")
+    public void resume(HttpServletResponse resp)  throws Exception {
+        FileInputStream fis = null;
+        OutputStream outStream = null;
+        try{
+            File file = new File(this.getClass().getResource("/resume.doc").getPath());
+            resp.addHeader("Content-Disposition", "attachment;filename=" + new String("个人简历-王帅.doc".getBytes(), "ISO-8859-1") );
+            outStream = resp.getOutputStream();// 得到向客户端输出二进制数据的对象
+            fis = new FileInputStream(file); // 以byte流的方式打开文件
+            // 读数据
+            byte data[] = new byte[1000];
+            while (fis.read(data) > 0) {
+                outStream.write(data);
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally{
+            fis.close();
+            outStream.close();
+        }
     }
 
 }
